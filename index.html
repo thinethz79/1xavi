@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+        }
+        .container-card {
+            background: #1e293b;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+        .input-field {
+            background: #334155;
+            border: 1px solid #475569;
+            color: #e2e8f0;
+        }
+        .btn-primary {
+            background-color: #3b82f6;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
+        }
+        .btn-ghost {
+            background: #334155;
+            color: #94a3b8;
+            border: 1px solid #475569;
+        }
+        .btn-ghost:hover {
+            background: #475569;
+            color: #e2e8f0;
+        }
+        .loading-ring {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="authContainer" class="w-full max-w-md p-8 rounded-xl container-card space-y-6">
+
+        <h2 class="text-3xl font-bold text-center text-white">Secure Access</h2>
+        <p class="text-center text-sm text-gray-400" id="statusMessage">Initializing Firebase...</p>
+
+        <!-- AUTH FORM (Initial View) -->
+        <div id="authForm" class="space-y-4 hidden">
+            <input type="email" id="emailInput" placeholder="Email" class="w-full p-3 rounded-lg input-field focus:outline-none focus:ring-2 focus:ring-blue-500" autocomplete="email">
+            <input type="password" id="passwordInput" placeholder="Password (min 6 characters)" class="w-full p-3 rounded-lg input-field focus:outline-none focus:ring-2 focus:ring-blue-500" autocomplete="current-password">
+            
+            <div class="flex flex-col space-y-3">
+                <button id="loginBtn" class="flex justify-center items-center w-full py-3 rounded-lg font-semibold btn-primary">
+                    <span id="loginText">Log In</span>
+                    <div id="loginSpinner" class="loading-ring hidden"></div>
+                </button>
+                <!-- NEW BUTTON: Get Key -->
+                <button id="getKeyBtn" class="flex justify-center items-center w-full py-3 rounded-lg font-semibold btn-ghost">
+                    Get Key for Predictor
+                </button>
+            </div>
+
+            <p id="errorBox" class="text-red-400 text-sm p-3 bg-red-900/30 rounded-lg hidden"></p>
+        </div>
+
+        <!-- DASHBOARD (Authenticated View) - Kept for users who navigate back while logged in -->
+        <div id="dashboard" class="space-y-6 hidden text-center">
+            <p class="text-lg font-semibold text-green-400">Welcome, you are logged in!</p>
+            <p class="text-sm text-gray-300">User ID: <span id="userIdDisplay" class="font-mono text-blue-300 break-all text-xs"></span></p>
+            <p class="text-sm text-gray-300">Email: <span id="userEmailDisplay" class="font-medium text-white"></span></p>
+            
+            <!-- Added link to the app for convenience -->
+            <a href="app.html" class="inline-block w-full py-2 rounded-lg font-semibold bg-green-600 hover:bg-green-700 transition">
+                Go to Predictor App
+            </a>
+            
+            <button id="logoutBtn" class="w-full py-2 rounded-lg font-semibold bg-red-600 hover:bg-red-700 transition">
+                Log Out
+            </button>
+        </div>
+    </div>
+
+    <script type="module">
+        // --- Firebase SDK Imports (Mandatory v11.6.1) ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            signInWithCustomToken, 
+            onAuthStateChanged,
+            signInWithEmailAndPassword,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        
+        // --- Firebase Configuration (Provided by User) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBJroxVxgL82nNXVGiOMjqTPFvhOZhWNH4",
+            authDomain: "thineth-bae42.firebaseapp.com",
+            projectId: "thineth-bae42",
+            storageBucket: "thineth-bae42.firebasestorage.app",
+            messagingSenderId: "392470243055",
+            appId: "1:392470243055:web:01220819864c8d08c2dd1a",
+            measurementId: "G-PTYXECLX4F"
+        };
+        
+        // --- DOM Elements ---
+        const authForm = document.getElementById('authForm');
+        const dashboard = document.getElementById('dashboard');
+        const emailInput = document.getElementById('emailInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const loginBtn = document.getElementById('loginBtn');
+        const getKeyBtn = document.getElementById('getKeyBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const statusMessage = document.getElementById('statusMessage');
+        const errorBox = document.getElementById('errorBox');
+        const userIdDisplay = document.getElementById('userIdDisplay');
+        const userEmailDisplay = document.getElementById('userEmailDisplay');
+
+        // Spinners and text elements
+        const loginSpinner = document.getElementById('loginSpinner');
+        const loginText = document.getElementById('loginText');
+
+        let auth;
+
+        // --- Firebase Initialization ---
+        function initializeFirebase() {
+            try {
+                // Initialize using the hardcoded configuration
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                
+                // Set up initial authentication using custom token or anonymously
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    signInWithCustomToken(auth, __initial_auth_token)
+                        .catch(e => {
+                            console.error("Custom token sign in failed, signing in anonymously. Error:", e);
+                            signInAnonymously(auth);
+                        });
+                } else {
+                    signInAnonymously(auth);
+                }
+
+                statusMessage.textContent = "Ready for login or to get your key.";
+
+                // Set up Authentication State Listener
+                onAuthStateChanged(auth, (user) => {
+                    updateUI(user);
+                });
+
+            } catch (error) {
+                console.error("Firebase Initialization Error:", error);
+                statusMessage.textContent = `Initialization Failed: ${error.message}`;
+                authForm.classList.remove('hidden');
+            }
+        }
+
+        // --- UI Logic ---
+        function updateUI(user) {
+            errorBox.classList.add('hidden');
+            
+            if (user && user.email) {
+                // Logged In with Email/Password
+                authForm.classList.add('hidden');
+                dashboard.classList.remove('hidden');
+                userIdDisplay.textContent = user.uid;
+                userEmailDisplay.textContent = user.email;
+                statusMessage.textContent = "You are currently signed in.";
+            } else if (user && user.isAnonymous) {
+                // Signed in Anonymously (Default state)
+                authForm.classList.remove('hidden');
+                dashboard.classList.add('hidden');
+                statusMessage.textContent = "Sign in or request a key below.";
+            } else {
+                // Logged Out (or initial anonymous state failed)
+                authForm.classList.remove('hidden');
+                dashboard.classList.add('hidden');
+                statusMessage.textContent = "Please sign in or request a key.";
+            }
+        }
+        
+        function showLoading(buttonId, isLoading) {
+            const btn = document.getElementById(buttonId);
+            const text = document.getElementById(buttonId.replace('Btn', 'Text'));
+            const spinner = document.getElementById(buttonId.replace('Btn', 'Spinner'));
+
+            btn.disabled = isLoading;
+            if (isLoading) {
+                text.classList.add('hidden');
+                spinner.classList.remove('hidden');
+                btn.classList.add('opacity-70');
+            } else {
+                text.classList.remove('hidden');
+                spinner.classList.add('hidden');
+                btn.classList.remove('opacity-70');
+            }
+        }
+
+        function displayError(message) {
+            errorBox.textContent = message;
+            errorBox.classList.remove('hidden');
+            setTimeout(() => {
+                errorBox.classList.add('hidden');
+            }, 5000);
+        }
+
+        // --- Auth Handlers ---
+
+        async function handleLogin() {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+            errorBox.classList.add('hidden');
+
+            if (!email || password.length < 6) {
+                displayError("Please enter a valid email and a password of at least 6 characters.");
+                return;
+            }
+
+            showLoading('loginBtn', true);
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                
+                // Redirect to the main application page on successful login
+                window.location.href = 'app.html'; 
+
+            } catch (error) {
+                let errorMessage = "Login Failed: An unknown error occurred.";
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    errorMessage = "Invalid credentials. Please check your email and password.";
+                } else if (error.code) {
+                    // Extracting readable error message from Firebase codes
+                    errorMessage = "Login Error: " + error.message.replace('Firebase: ', '');
+                }
+                displayError(errorMessage);
+            } finally {
+                showLoading('loginBtn', false);
+            }
+        }
+
+        // HANDLER: Sends WhatsApp message
+        function handleGetKey() {
+            // Using the full number provided by the user, assuming the system handles the prefix correctly.
+            const phoneNumber = "94774337016"; // Using the implied international format for reliability
+            const message = "i want buy a key to aviatar predictor";
+            const encodedMessage = encodeURIComponent(message);
+            
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+            
+            // Open the WhatsApp link in a new tab
+            window.open(whatsappUrl, '_blank');
+            statusMessage.textContent = "Opening WhatsApp to send your request...";
+        }
+
+        async function handleLogout() {
+            try {
+                await signOut(auth);
+                // Re-authenticate anonymously after logout
+                await signInAnonymously(auth);
+                statusMessage.textContent = "Signed out successfully.";
+                emailInput.value = '';
+                passwordInput.value = '';
+            } catch (error) {
+                console.error("Logout Error:", error);
+                displayError("Failed to log out.");
+            }
+        }
+
+        // --- Event Listeners ---
+        loginBtn.addEventListener('click', handleLogin);
+        getKeyBtn.addEventListener('click', handleGetKey);
+        logoutBtn.addEventListener('click', handleLogout);
+
+        // Allow pressing Enter in the password field to submit login
+        passwordInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                handleLogin();
+            }
+        });
+
+        // --- Initialization on Load ---
+        initializeFirebase();
+    </script>
+</body>
+</html>
