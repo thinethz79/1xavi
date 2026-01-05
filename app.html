@@ -3,428 +3,823 @@
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width,initial-scale=1" />
-	<title></title>
-	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+	<title>Temporal Rift Analyzer [PRO]</title>
+	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 	<style>
-		:root{--bg:#0f1724;--card:#111827;--muted:#9ca3af;--accent:#60a5fa;--accent-dark:#4f92f8;--danger:#ef4444}
-		*{box-sizing:border-box;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial}
-		body{background:linear-gradient(180deg,#071029 0%, #07121a 100%);color:#e6eef8;margin:0;padding:24px}
-		.wrap{max-width:920px;margin:0 auto}
-		header{display:flex;align-items:center;gap:16px;margin-bottom:18px; justify-content: space-between;}
-		h1{font-size:20px;margin:0}
-		p.lead{margin:0;color:var(--muted);font-size:14px}
-
-		/* Live Time Display */
-		.live-time {
-			font-size: 24px;
-			font-weight: 700;
-			color: var(--accent);
-			background: rgba(96, 165, 250, 0.1);
-			padding: 8px 12px;
-			border-radius: 8px;
-			box-shadow: 0 0 10px rgba(96, 165, 250, 0.3);
+		:root {
+			--bg-color: #0b0f14;
+			--panel-bg: #131923;
+			--cyan: #00e5ff;
+			--cyan-dim: rgba(0, 229, 255, 0.15);
+			--accent: #ffae00; /* Orange for alerts/highlights */
+			--success: #00ff9d;
+			--danger: #ff3333;
+			--text-main: #e0f7fa;
+			--text-muted: #6b7c93;
+			--border: 1px solid rgba(0, 229, 255, 0.2);
 		}
 
-		/* Notification Banner Styling */
-		#notificationBanner {
-			display: none;
+		* { box-sizing: border-box; }
+
+		body {
+			background-color: var(--bg-color);
+			color: var(--text-main);
+			font-family: 'Rajdhani', sans-serif;
+			margin: 0;
+			padding: 24px;
+			min-height: 100vh;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			font-weight: 500;
+		}
+
+		/* Professional Grid Background */
+		body::before {
+			content: "";
 			position: fixed;
-			top: 24px;
-			left: 50%;
-			transform: translateX(-50%);
-			z-index: 10;
-			padding: 12px 20px;
-			background-color: #f59e0b; /* Amber */
-			color: #1f2937;
+			top: 0; left: 0; width: 100%; height: 100%;
+			background-image: 
+				linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+				linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+			background-size: 50px 50px;
+			z-index: -1;
+			pointer-events: none;
+		}
+
+		.container {
+			width: 100%;
+			max-width: 1100px;
+		}
+
+		/* Header */
+		header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 24px;
+			border-bottom: 2px solid var(--cyan);
+			padding-bottom: 12px;
+		}
+
+		h1 {
+			font-family: 'JetBrains Mono', monospace;
+			font-size: 24px;
+			margin: 0;
+			text-transform: uppercase;
+			letter-spacing: -1px;
+			color: var(--cyan);
+		}
+
+		.badge {
+			background: var(--cyan);
+			color: #000;
+			font-size: 11px;
+			padding: 2px 6px;
+			border-radius: 2px;
+			margin-left: 8px;
 			font-weight: 700;
-			border-radius: 8px;
-			box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-			font-size: 16px;
-			animation: pulse 1.5s infinite;
-		}
-		@keyframes pulse {
-			0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
-			50% { opacity: 0.9; transform: translateX(-50%) scale(1.02); }
+			vertical-align: middle;
 		}
 
-		.card{background:var(--card);padding:16px;border-radius:12px;box-shadow:0 6px 20px rgba(2,6,23,0.6);}
-		.grid{display:grid;grid-template-columns:1fr 360px;gap:16px}
-		textarea{
-			width:100%;min-height:240px;padding:12px;border-radius:8px;
-			border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.02);
-			color:inherit;font-size:13px;transition:border-color 0.2s, box-shadow 0.2s;
+		/* Live Clock */
+		.system-clock {
+			font-family: 'JetBrains Mono', monospace;
+			font-size: 18px;
+			color: var(--text-main);
+			background: rgba(0,0,0,0.3);
+			padding: 4px 12px;
+			border-left: 3px solid var(--accent);
 		}
-		textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.4); }
-		label{display:block;font-size:12px;margin-bottom:8px;color:var(--muted)}
-		.controls{display:flex;gap:8px;margin-top:12px}
+
+		/* Main Interface */
+		.interface-grid {
+			display: grid;
+			grid-template-columns: 320px 1fr;
+			gap: 20px;
+		}
+
+		@media (max-width: 850px) {
+			.interface-grid { grid-template-columns: 1fr; }
+		}
+
+		/* Panels */
+		.panel {
+			background: var(--panel-bg);
+			border: var(--border);
+			padding: 0; /* padding handled by children */
+			display: flex;
+			flex-direction: column;
+		}
+
+		.panel-header {
+			background: rgba(0, 229, 255, 0.05);
+			padding: 10px 16px;
+			font-size: 13px;
+			text-transform: uppercase;
+			letter-spacing: 1px;
+			color: var(--cyan);
+			border-bottom: var(--border);
+			font-family: 'JetBrains Mono', monospace;
+			display: flex;
+			justify-content: space-between;
+		}
+
+		.panel-body {
+			padding: 16px;
+			flex: 1;
+		}
+
+		/* Input Area */
+		textarea {
+			width: 100%;
+			height: 300px;
+			background: #080c11;
+			border: 1px solid #2c3e50;
+			color: #fff;
+			font-family: 'JetBrains Mono', monospace;
+			font-size: 14px;
+			padding: 12px;
+			resize: none;
+			outline: none;
+			line-height: 1.5;
+		}
+		textarea:focus { border-color: var(--cyan); }
+
+		.controls {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 8px;
+			margin-top: 12px;
+		}
+
+		button {
+			background: transparent;
+			border: 1px solid var(--cyan);
+			color: var(--cyan);
+			padding: 10px;
+			font-family: 'JetBrains Mono', monospace;
+			font-size: 12px;
+			text-transform: uppercase;
+			cursor: pointer;
+			transition: 0.2s;
+			font-weight: bold;
+		}
+
+		button:hover { background: var(--cyan-dim); }
+		button.primary { background: var(--cyan); color: #000; }
+		button.primary:hover { background: #fff; box-shadow: 0 0 15px var(--cyan); }
 		
-		/* Buttons */
-		button{
-			background:var(--accent);border:0;padding:10px 14px;border-radius:10px;
-			color:#06202b;font-weight:600;cursor:pointer;
-			transition: background-color 0.2s, box-shadow 0.2s, transform 0.1s;
-			white-space: nowrap;
+		button.action-add { grid-column: span 2; border-color: var(--text-muted); color: var(--text-muted); }
+		button.action-add:hover { border-color: var(--text-main); color: var(--text-main); background: rgba(255,255,255,0.05); }
+
+		/* Results Area */
+		.dashboard {
+			display: flex;
+			flex-direction: column;
+			gap: 20px;
+			height: 100%;
 		}
-		button:hover{ background: var(--accent-dark); box-shadow: 0 4px 12px rgba(96, 165, 250, 0.4); }
-		button:active{ transform: scale(0.98); }
 
-		button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--muted); padding:8px 12px;}
-		button.ghost:hover{ background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2); box-shadow: none; }
-		button.ghost:active{ background: rgba(255,255,255,0.03); }
+		/* Top Metrics */
+		.metrics-row {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 12px;
+		}
 
-		.small{font-size:13px;}
+		.metric-card {
+			background: rgba(0,0,0,0.2);
+			border: 1px solid rgba(255,255,255,0.05);
+			padding: 10px;
+		}
+
+		.metric-label {
+			font-size: 11px;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			margin-bottom: 4px;
+		}
+
+		.metric-value {
+			font-family: 'JetBrains Mono', monospace;
+			font-size: 18px;
+			color: var(--text-main);
+		}
+
+		.metric-value.highlight { color: var(--cyan); }
 		
-		/* Output & Results */
-		table{width:100%;border-collapse:collapse;margin-top:10px}
-		th,td{padding:8px 6px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px}
-		th{color:var(--muted);font-weight:600;text-transform:uppercase;font-size:11px}
-		td:nth-child(3){font-weight:600;}
-
-		.result{margin-top:16px;padding:14px;border-radius:10px;background:linear-gradient(90deg, rgba(96,165,250,0.08), rgba(96,165,250,0.03));color:#dbeafe; border: 1px solid rgba(96,165,250,0.2);}
-		.pred{font-size:24px;font-weight:700}
-		.muted{color:var(--muted)}
-		.inline{display:flex;gap:8px;align-items:center}
-		.spark{height:48px;margin-top:10px}
-		.stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px;}
-		.stat-box { background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; font-size: 13px; }
-		.stat-box .val { font-weight: 700; color: #fff; font-size: 14px; display: block; margin-top: 2px;}
-
-		.error-box { padding: 10px; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); border-radius: 8px; color: var(--danger); font-size: 13px; margin-top: 12px;}
-
-		footer{margin-top:24px;color:var(--muted);font-size:12px;text-align:center;}
-
-		@media (max-width:880px){
-			.grid{grid-template-columns:1fr;}
-			.card{padding:12px;}
-			.controls{flex-wrap: wrap;}
-			.live-time { font-size: 20px; padding: 6px 10px; }
+		/* Confidence Bar */
+		.confidence-container {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			margin-top: 4px;
 		}
+		.confidence-track {
+			flex: 1;
+			height: 4px;
+			background: #333;
+			position: relative;
+		}
+		.confidence-fill {
+			height: 100%;
+			background: var(--success);
+			width: 0%;
+			transition: width 0.5s ease;
+		}
+
+		/* Visualizer */
+		.vis-wrapper {
+			height: 80px;
+			background: #080c11;
+			border: var(--border);
+			position: relative;
+			overflow: hidden;
+		}
+		canvas { width: 100%; height: 100%; display: block; }
+
+		/* Prediction Table */
+		.forecast-table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-top: 0;
+		}
+		
+		.forecast-table th {
+			text-align: left;
+			font-size: 11px;
+			color: var(--text-muted);
+			padding: 8px;
+			border-bottom: 1px solid rgba(255,255,255,0.1);
+			font-family: 'JetBrains Mono', monospace;
+		}
+
+		.forecast-table td {
+			padding: 10px 8px;
+			font-size: 15px;
+			border-bottom: 1px solid rgba(255,255,255,0.05);
+			font-family: 'JetBrains Mono', monospace;
+		}
+
+		.row-prediction {
+			background: rgba(0, 229, 255, 0.03);
+		}
+		.row-prediction td {
+			color: var(--cyan);
+		}
+
+		.countdown-badge {
+			display: inline-block;
+			font-size: 12px;
+			padding: 2px 6px;
+			border-radius: 4px;
+			background: rgba(0,0,0,0.4);
+			border: 1px solid rgba(255,255,255,0.1);
+			min-width: 60px;
+			text-align: center;
+		}
+		.countdown-badge.imminent {
+			border-color: var(--danger);
+			color: var(--danger);
+			animation: pulse 1s infinite;
+		}
+		
+		@keyframes pulse { 50% { opacity: 0.5; } }
+
+		/* Status Bar */
+		.status-bar {
+			margin-top: auto;
+			font-size: 12px;
+			color: var(--text-muted);
+			display: flex;
+			justify-content: space-between;
+			border-top: 1px solid rgba(255,255,255,0.05);
+			padding-top: 10px;
+		}
+
+		/* Empty State */
+		.empty-state {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			height: 100%;
+			color: var(--text-muted);
+			font-style: italic;
+			background: repeating-linear-gradient(
+				45deg,
+				rgba(0,0,0,0),
+				rgba(0,0,0,0) 10px,
+				rgba(255,255,255,0.02) 10px,
+				rgba(255,255,255,0.02) 20px
+			);
+		}
+
+		/* Floating Alert */
+		#toast {
+			position: fixed;
+			top: 20px;
+			left: 50%;
+			transform: translateX(-50%) translateY(-100px);
+			background: var(--accent);
+			color: #000;
+			padding: 10px 20px;
+			font-family: 'JetBrains Mono', monospace;
+			font-weight: bold;
+			z-index: 100;
+			box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+			transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+		}
+		#toast.show { transform: translateX(-50%) translateY(0); }
+
 	</style>
 </head>
 <body>
-	<div class="wrap">
+
+	<div id="toast">EVENT IMMINENT</div>
+
+	<div class="container">
 		<header>
 			<div>
-				<h1>Time Pattern Predictor</h1>
-				<p class="lead">Compute gaps between times in **HH:MM:SS** format and predict the next entry using a dynamic alternating-gap model.</p>
+				<h1>Temporal Rift Analyzer <span class="badge">PRO</span></h1>
 			</div>
-			<!-- LIVE TIME DISPLAY -->
-			<div id="liveTime" class="live-time"></div>
+			<div class="system-clock" id="clock">00:00:00</div>
 		</header>
 
-		<!-- Notification Banner -->
-		<div id="notificationBanner" style="display:none;">PREDICTION ALERT: Next time approaching!</div>
-
-		<div class="grid">
-			<div class="card">
-				<label for="timesInput">Enter Times (one per line, e.g., 10:23:36)</label>
-				<textarea id="timesInput" placeholder="10:23:36&#10;10:24:56&#10;10:27:27&#10;10:29:07"></textarea>
-				<div class="controls">
-					<button id="calcBtn">Calculate & Predict</button>
-					<button id="addNow" class="ghost small">Add Current Time</button>
-					<button id="clearBtn" class="ghost small">Clear All</button>
-					<button id="copyBtn" class="ghost small" style="display: none;">Copy Prediction</button>
+		<div class="interface-grid">
+			
+			<!-- Left Column: Input -->
+			<div class="panel">
+				<div class="panel-header">
+					<span>Source Data</span>
+					<span>TXT-IN</span>
 				</div>
-
-				<div id="output"></div>
-			</div>
-
-			<div>
-				<div class="card">
-					<label>Analysis & Gaps</label>
-					<div id="gapsArea">Enter times and click "Calculate & Predict".</div>
-					<div class="spark" id="sparkArea"></div>
-					
-					<div class="result" id="resultArea" style="display:none">
-						<div class="inline"><div class="muted">Last recorded time:</div><div id="lastTime" style="margin-left:6px;font-weight:700"></div></div>
-						
-						<div style="margin-top:12px">
-							<div class="muted" style="font-size:13px;">Predicted Next Time:</div>
-							<div id="predTime" class="pred"></div>
-						</div>
-						
-						<div style="margin-top:12px; font-size: 12px;">
-							<div class="muted">Prediction Heuristic Breakdown:</div>
-							<div class="stats-grid">
-								<div class="stat-box">Median Gap:<span id="statMed" class="val"></span></div>
-								<div class="stat-box">Last Gap:<span id="statLast" class="val"></span></div>
-								<div class="stat-box">Average Low Gap:<span id="statLow" class="val"></span></div>
-								<div class="stat-box">Average High Gap:<span id="statHigh" class="val"></span></div>
-							</div>
-							<div class="muted" style="margin-top:8px;" id="algoNote"></div>
-						</div>
+				<div class="panel-body">
+					<textarea id="inputArea" placeholder="10:23:36&#10;10:24:56&#10;10:27:27" spellcheck="false"></textarea>
+					<div class="controls">
+						<button class="primary" id="analyzeBtn">Analyze Pattern</button>
+						<button id="clearBtn">Clear</button>
+						<button class="action-add" id="markNowBtn">+ Mark Current Time</button>
 					</div>
 				</div>
+			</div>
 
-				<!-- Removed Prediction Logic Section -->
-				
+			<!-- Right Column: Analysis -->
+			<div class="panel">
+				<div class="panel-header">
+					<span>Analysis & Forecast</span>
+					<span id="patternType">NO DATA</span>
+				</div>
+				<div class="panel-body" style="padding: 0;">
+					
+					<!-- Content Wrapper -->
+					<div id="resultsView" style="display:none; padding: 20px; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px;">
+						
+						<!-- Top Metrics -->
+						<div class="metrics-row">
+							<div class="metric-card">
+								<div class="metric-label">Pattern Confidence</div>
+								<div class="confidence-container">
+									<div class="metric-value highlight" id="confidenceVal">--%</div>
+									<div class="confidence-track"><div class="confidence-fill" id="confidenceBar"></div></div>
+								</div>
+							</div>
+							<div class="metric-card">
+								<div class="metric-label">Mean Gap</div>
+								<div class="metric-value" id="meanGap">--</div>
+							</div>
+							<div class="metric-card">
+								<div class="metric-label">Drift / Variance</div>
+								<div class="metric-value" id="driftVal">--</div>
+							</div>
+						</div>
+
+						<!-- Visualizer -->
+						<div>
+							<div class="metric-label" style="margin-bottom: 5px;">Interval Waveform</div>
+							<div class="vis-wrapper">
+								<canvas id="canvas"></canvas>
+							</div>
+						</div>
+
+						<!-- Table -->
+						<div style="flex: 1; overflow: hidden; display: flex; flex-direction: column;">
+							<div class="metric-label" style="margin-bottom: 5px;">Sequence Forecast</div>
+							<div style="overflow-y: auto; border: 1px solid rgba(255,255,255,0.1);">
+								<table class="forecast-table">
+									<thead>
+										<tr>
+											<th>ID</th>
+											<th>Timestamp</th>
+											<th>Interval</th>
+											<th>Status</th>
+										</tr>
+									</thead>
+									<tbody id="tableBody">
+										<!-- JS populates this -->
+									</tbody>
+								</table>
+							</div>
+						</div>
+
+						<div class="status-bar">
+							<span id="algoName">Algorithm: Awaiting Input</span>
+							<span>LIVE MONITORING ACTIVE</span>
+						</div>
+
+					</div>
+
+					<!-- Empty State -->
+					<div id="emptyState" class="empty-state">
+						ENTER TIMESTAMPS TO BEGIN SEQUENCE DECRYPTION
+					</div>
+
+				</div>
 			</div>
 		</div>
-
-		<footer>This tool uses a simple statistical heuristic for forecasting time patterns. It is an estimate and not guaranteed to be accurate.</footer>
 	</div>
 
 	<script>
-		// Global state to hold the last successful prediction time (in seconds of the day)
-		let currentPredictedTimeSec = null;
-
-		// --- Utility Functions ---
-		function parseTimeToSeconds(t){
-			if(!t) return null;
-			t = t.trim();
-			const parts = t.split(':').map(x=>x.trim());
-			if(parts.length !== 3) return null;
-			const h = parseInt(parts[0],10);
-			const m = parseInt(parts[1],10);
-			const s = parseInt(parts[2],10);
-			if(Number.isNaN(h)||Number.isNaN(m)||Number.isNaN(s) || h < 0 || m < 0 || s < 0) return null;
-			return h*3600 + m*60 + s;
-		}
-
-		function secondsToHMS(sec){
-			sec = Math.round(sec);
-			sec = ((sec % 86400) + 86400) % 86400; // wrap in day (0 to 86399)
-			const h = Math.floor(sec/3600);
-			const m = Math.floor((sec%3600)/60);
-			const s = sec%60;
-			return [h,m,s].map(x=>String(x).padStart(2,'0')).join(':');
-		}
-
-		function median(arr){
-			if(!arr.length) return 0;
-			const a = arr.slice().sort((x,y)=>x-y);
-			const mid = Math.floor(a.length/2);
-			return a.length%2 ? a[mid] : (a[mid-1]+a[mid])/2;
-		}
+		// --- State ---
+		let predictions = []; // Array of predicted timestamps (seconds)
+		let lastAnalysis = null;
 		
-		function toSecondsLabel(s) {
-			return `${s}s`;
+		// --- DOM Elements ---
+		const els = {
+			input: document.getElementById('inputArea'),
+			analyzeBtn: document.getElementById('analyzeBtn'),
+			clearBtn: document.getElementById('clearBtn'),
+			markBtn: document.getElementById('markNowBtn'),
+			results: document.getElementById('resultsView'),
+			empty: document.getElementById('emptyState'),
+			clock: document.getElementById('clock'),
+			canvas: document.getElementById('canvas'),
+			table: document.getElementById('tableBody'),
+			metrics: {
+				confVal: document.getElementById('confidenceVal'),
+				confBar: document.getElementById('confidenceBar'),
+				mean: document.getElementById('meanGap'),
+				drift: document.getElementById('driftVal'),
+				pattern: document.getElementById('patternType'),
+				algo: document.getElementById('algoName')
+			},
+			toast: document.getElementById('toast')
+		};
+
+		// --- Core Math & Time Utilities ---
+
+		function timeToSec(str) {
+			const p = str.trim().split(':');
+			if(p.length !== 3) return null;
+			const h = parseInt(p[0]), m = parseInt(p[1]), s = parseInt(p[2]);
+			if(isNaN(h) || isNaN(m) || isNaN(s)) return null;
+			return h * 3600 + m * 60 + s;
 		}
 
-		// --- Main Logic ---
-		function computePrediction(times){
-			const secs = times.map(parseTimeToSeconds).filter(x=>x!==null);
-			if(secs.length < 2) return {error:'Please enter at least 2 valid times in HH:MM:SS format.'};
-			
-			// Compute gaps
+		function secToTime(sec) {
+			sec = Math.round(sec);
+			sec = ((sec % 86400) + 86400) % 86400;
+			const h = Math.floor(sec / 3600).toString().padStart(2, '0');
+			const m = Math.floor((sec % 3600) / 60).toString().padStart(2, '0');
+			const s = (sec % 60).toString().padStart(2, '0');
+			return `${h}:${m}:${s}`;
+		}
+
+		// --- Advanced Analysis Engine ---
+
+		function analyzeData(rawLines) {
+			const seconds = rawLines.map(timeToSec).filter(x => x !== null);
+			if(seconds.length < 2) return { error: "Insufficient Data" };
+
+			// Calculate Gaps
 			const gaps = [];
-			for(let i=1;i<secs.length;i++){
-				gaps.push(secs[i]-secs[i-1]);
+			for(let i=1; i<seconds.length; i++) {
+				let g = seconds[i] - seconds[i-1];
+				// Handle midnight crossing (if gap is negative, add 24h)
+				if (g < -40000) g += 86400; 
+				gaps.push(g);
 			}
+
+			// 1. Check for Pattern / Cycles
+			// We try periods 1 (fixed), 2 (alternating), 3, 4
+			let bestPeriod = 0;
+			let bestError = Infinity;
+
+			// We need at least (period * 2) gaps to verify a pattern effectively, 
+			// but for small data we can try minimal overlapping.
+			for (let p = 1; p <= 4; p++) {
+				if (gaps.length < p + 1) break; // Need enough data
+
+				let errorSum = 0;
+				let count = 0;
+				
+				// Compare gap[i] with gap[i-p]
+				// We weight recent errors more heavily
+				for (let i = p; i < gaps.length; i++) {
+					const diff = Math.abs(gaps[i] - gaps[i-p]);
+					// Weighting: newer data points (higher i) count more
+					const weight = 1 + (i / gaps.length); 
+					errorSum += diff * weight;
+					count += weight;
+				}
+
+				const avgError = errorSum / count;
+				if (avgError < bestError) {
+					bestError = avgError;
+					bestPeriod = p;
+				}
+			}
+
+			// 2. Check for Linear Drift (Acceleration)
+			// Calculate 'acceleration' (diff of gaps)
+			let driftSum = 0;
+			if (gaps.length >= 2) {
+				for(let i=1; i<gaps.length; i++) driftSum += (gaps[i] - gaps[i-1]);
+			}
+			const avgDrift = gaps.length >= 2 ? driftSum / (gaps.length - 1) : 0;
+			const isDrifting = Math.abs(avgDrift) > 2; // Threshold for considering it drift
+
+			// --- Decision Logic ---
 			
-			// Statistical analysis
-			const med = median(gaps);
-			const lows = gaps.filter(g=>g<=med);
-			const highs = gaps.filter(g=>g>med);
+			let forecastGaps = [];
+			let patternName = "UNKNOWN";
+			let confidence = 0;
+			let algorithmUsed = "";
+
+			const meanGap = gaps.reduce((a,b)=>a+b,0) / gaps.length;
+
+			// Heuristic Scoring
+			// Normalize error relative to the magnitude of the gap
+			const relError = bestError / (meanGap || 1); 
+
+			if (gaps.length < 3) {
+				// Fallback for tiny data: Simple average
+				const last = gaps[gaps.length-1];
+				forecastGaps = [last, last, last];
+				patternName = "INSUFFICIENT DATA";
+				algorithmUsed = "Last Value Projection";
+				confidence = 50;
+			} else if (isDrifting && relError > 0.1) {
+				// Drift is dominant and pattern is weak
+				patternName = "LINEAR DRIFT";
+				algorithmUsed = `Linear Regression (Drift: ${avgDrift > 0 ? '+' : ''}${Math.round(avgDrift)}s)`;
+				const lastGap = gaps[gaps.length-1];
+				forecastGaps = [
+					lastGap + avgDrift,
+					lastGap + avgDrift*2,
+					lastGap + avgDrift*3
+				];
+				// Confidence based on consistency of drift
+				confidence = 70; 
+			} else {
+				// Pattern Based
+				if (bestPeriod === 1) patternName = "FIXED INTERVAL";
+				else if (bestPeriod === 2) patternName = "ALTERNATING CYCLE";
+				else patternName = `COMPLEX CYCLE (${bestPeriod}-STEP)`;
+
+				algorithmUsed = `Pattern Match (Period: ${bestPeriod})`;
+				
+				// Generate next 3 gaps based on pattern
+				// We project: next is matching index - Period
+				for (let k = 1; k <= 3; k++) {
+					// Use modulo logic to find which step in the cycle corresponds to the future
+					// The index in gaps for the next prediction would be gaps.length
+					// The corresponding past index is gaps.length - bestPeriod
+					// For T+k: index is gaps.length + (k-1)
+					// So we look back: (gaps.length + k - 1) % bestPeriod ? 
+					// Actually simpler: just repeat the last 'bestPeriod' gaps.
+					
+					// Get the gap from 'bestPeriod' steps ago relative to the new position
+					// We need to fetch from the end of the array, wrapping around the period.
+					const sourceIndex = gaps.length - bestPeriod + ((k-1) % bestPeriod);
+					// If sourceIndex is valid
+					if(sourceIndex >= 0) {
+						forecastGaps.push(gaps[sourceIndex]);
+					} else {
+						forecastGaps.push(meanGap); // Fallback
+					}
+				}
+
+				// Confidence Calculation (Inverse of error)
+				// relError 0.0 -> 100%, 0.2 -> 60%, 0.5 -> 0%
+				confidence = Math.max(0, Math.min(100, 100 - (relError * 200)));
+			}
+
+			// Round confidence
+			confidence = Math.round(confidence);
+
+			// Calculate Future Timestamps
+			const futureTimes = [];
+			let lastTime = seconds[seconds.length-1];
 			
-			const avgLow = lows.length? Math.round(lows.reduce((a,b)=>a+b,0)/lows.length): Math.round(med*0.9);
-			const avgHigh = highs.length? Math.round(highs.reduce((a,b)=>a+b,0)/highs.length): Math.round(med*1.3);
-			
-			const lastGap = gaps[gaps.length-1];
-			
-			// Prediction logic: Alternating low/high
-			const predictedGap = (lastGap <= med) ? avgHigh : avgLow;
-			const lastTimeSec = secs[secs.length-1];
-			
-			// Calculate predicted time and ensure it wraps within the 24-hour cycle
-			let predictedTimeSec = lastTimeSec + predictedGap;
-			predictedTimeSec = ((predictedTimeSec % 86400) + 86400) % 86400;
+			forecastGaps.forEach(g => {
+				const nextT = lastTime + g;
+				futureTimes.push(nextT);
+				lastTime = nextT;
+			});
 
 			return {
-				gaps, med, avgLow, avgHigh, lastGap, predictedGap, lastTimeSec, predictedTimeSec, secs
+				gaps,
+				seconds,
+				forecastGaps,
+				futureTimes,
+				patternName,
+				algorithmUsed,
+				confidence,
+				meanGap,
+				avgDrift: isDrifting ? avgDrift : 0
 			};
 		}
 
-		// --- UI Wiring ---
-		const timesInput = document.getElementById('timesInput');
-		const calcBtn = document.getElementById('calcBtn');
-		const output = document.getElementById('output');
-		const gapsArea = document.getElementById('gapsArea');
-		const resultArea = document.getElementById('resultArea');
-		const lastTimeEl = document.getElementById('lastTime');
-		const predTimeEl = document.getElementById('predTime');
-		const algoNote = document.getElementById('algoNote');
-		const sparkArea = document.getElementById('sparkArea');
-		const addNow = document.getElementById('addNow');
-		const clearBtn = document.getElementById('clearBtn');
-		const copyBtn = document.getElementById('copyBtn');
-		const notificationElement = document.getElementById('notificationBanner');
-		const liveTimeEl = document.getElementById('liveTime'); // Reference for the new element
-		
-		const statMed = document.getElementById('statMed');
-		const statLow = document.getElementById('statLow');
-		const statHigh = document.getElementById('statHigh');
-		const statLast = document.getElementById('statLast');
+		// --- Rendering ---
 
-
-		function renderResult(obj, rawTimes){
-			output.innerHTML = ''; // Clear previous error messages
-			copyBtn.style.display = 'block';
-
-			if(obj.error){
-				output.innerHTML = `<div class="error-box">${obj.error}</div>`;
-				gapsArea.innerHTML='No data to analyze.'; 
-				resultArea.style.display='none'; 
-				sparkArea.innerHTML = '';
-				copyBtn.style.display = 'none';
-				currentPredictedTimeSec = null; // Clear global prediction on error
-				return; 
-			}
-
-			// Gaps table
-			let html = '<table><thead><tr><th>#</th><th>Time</th><th>Gap</th></tr></thead><tbody>';
-			for(let i=0;i<obj.secs.length;i++){
-				const t = secondsToHMS(obj.secs[i]);
-				const g = i===0? '-' : toSecondsLabel(obj.gaps[i-1]);
-				html += `<tr><td>${i+1}</td><td>${t}</td><td>${g}</td></tr>`;
-			}
-			html += '</tbody></table>';
-			gapsArea.innerHTML = html;
-
-			// spark (simple svg bars)
-			const maxGap = Math.max(...obj.gaps, 1);
-			let svg = `<svg width="100%" height="48" viewBox="0 0 200 48" preserveAspectRatio="none">`;
-			// Calculate bar width dynamically based on the number of gaps
-			const numGaps = obj.gaps.length;
-			const totalSpacing = numGaps > 1 ? (numGaps - 1) * 2 : 0; // 2 units spacing between bars
-			const totalWidth = 200 - totalSpacing;
-			const barW = Math.max(3, Math.floor(totalWidth / numGaps));
+		function drawWaveform(gaps) {
+			const ctx = els.canvas.getContext('2d');
+			const w = els.canvas.width = els.canvas.offsetWidth;
+			const h = els.canvas.height = els.canvas.offsetHeight;
 			
-			obj.gaps.forEach((g,i)=>{
-				const h = Math.round((g/maxGap)*36)+6; // minimum height of 6
-				const x = i*(barW+2); // x position with spacing
-				svg += `<rect x="${x}" y="${48-h}" width="${barW}" height="${h}" rx="1" fill="rgba(96,165,250,0.9)" />`;
+			ctx.clearRect(0,0,w,h);
+			
+			if(!gaps.length) return;
+
+			const max = Math.max(...gaps) * 1.1;
+			const min = Math.min(...gaps) * 0.9;
+			const range = max - min || 1;
+			
+			const stepX = w / (gaps.length - 1 || 1);
+
+			// Draw path
+			ctx.beginPath();
+			gaps.forEach((g, i) => {
+				const x = i * stepX;
+				const y = h - ((g - min) / range) * h;
+				if(i===0) ctx.moveTo(x,y);
+				else ctx.lineTo(x,y);
 			});
-			svg += `</svg>`;
-			sparkArea.innerHTML = svg;
-
-			// result area
-			lastTimeEl.textContent = secondsToHMS(obj.lastTimeSec);
-			predTimeEl.textContent = secondsToHMS(obj.predictedTimeSec);
 			
-			// Detailed stats for stat boxes
-			statMed.textContent = toSecondsLabel(Math.round(obj.med));
-			statLow.textContent = toSecondsLabel(obj.avgLow);
-			statHigh.textContent = toSecondsLabel(obj.avgHigh);
-			statLast.textContent = toSecondsLabel(obj.lastGap);
+			ctx.strokeStyle = '#00e5ff';
+			ctx.lineWidth = 2;
+			ctx.stroke();
 
-			// Algorithm note
-			const action = (obj.lastGap <= obj.med) ? 'low (≤ median)' : 'high (> median)';
-			const predictionSource = (obj.lastGap <= obj.med) ? toSecondsLabel(obj.avgHigh) : toSecondsLabel(obj.avgLow);
-			const predictionType = (obj.lastGap <= obj.med) ? 'Avg High' : 'Avg Low';
-			
-			algoNote.innerHTML = `The last gap (${toSecondsLabel(obj.lastGap)}) was classified as **${action}**, so the next predicted gap is **${predictionSource}** (${predictionType}).`;
-			
-			// Store prediction time globally for the proximity check
-			currentPredictedTimeSec = obj.predictedTimeSec;
-
-			resultArea.style.display = 'block';
+			// Draw points
+			ctx.fillStyle = '#fff';
+			gaps.forEach((g, i) => {
+				const x = i * stepX;
+				const y = h - ((g - min) / range) * h;
+				ctx.beginPath();
+				ctx.arc(x, y, 3, 0, Math.PI*2);
+				ctx.fill();
+			});
 		}
 
-		// --- Proximity Check Logic ---
-		function checkProximity() {
-			if (!currentPredictedTimeSec || !notificationElement) {
-				if (notificationElement) notificationElement.style.display = 'none';
+		function renderResults(data) {
+			if(data.error) {
+				els.results.style.display = 'none';
+				els.empty.style.display = 'flex';
 				return;
 			}
 
-			const now = new Date();
-			const nowSecOfDay = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+			els.empty.style.display = 'none';
+			els.results.style.display = 'flex'; // Changed to flex to support the structure
+
+			// Update Metrics
+			els.metrics.pattern.textContent = data.patternName;
+			els.metrics.pattern.style.color = data.confidence > 80 ? 'var(--success)' : (data.confidence < 40 ? 'var(--danger)' : 'var(--cyan)');
 			
-			// Calculate the difference. Both times are in seconds of the day (0-86399).
-			let diffSec = currentPredictedTimeSec - nowSecOfDay;
+			els.metrics.confVal.textContent = data.confidence + '%';
+			els.metrics.confBar.style.width = data.confidence + '%';
+			els.metrics.confBar.style.backgroundColor = data.confidence > 70 ? 'var(--success)' : (data.confidence < 40 ? 'var(--danger)' : 'var(--accent)');
 
-			// Handle wrap-around: If the difference is large and negative, it means the prediction wraps to the next day.
-			if (diffSec < -43200) { 
-				diffSec += 86400;
+			els.metrics.mean.textContent = Math.round(data.meanGap) + 's';
+			els.metrics.drift.textContent = Math.round(data.avgDrift) + 's';
+			els.metrics.algo.textContent = "ALGO: " + data.algorithmUsed;
+
+			// Draw Wave
+			drawWaveform(data.gaps);
+
+			// Build Table
+			let html = '';
+			
+			// 1. Historical Rows (Last 5 only to save space)
+			const startIdx = Math.max(0, data.seconds.length - 5);
+			for(let i = startIdx; i < data.seconds.length; i++) {
+				const gapStr = i > 0 ? `+${Math.round(data.gaps[i-1])}s` : '-';
+				html += `
+					<tr>
+						<td style="color:var(--text-muted)">#${String(i+1).padStart(2,'0')}</td>
+						<td>${secToTime(data.seconds[i])}</td>
+						<td style="color:var(--text-muted)">${gapStr}</td>
+						<td style="font-size:11px; color:var(--text-muted)">RECORDED</td>
+					</tr>
+				`;
 			}
 
-			const threshold = 15; // 15 seconds threshold
+			// 2. Prediction Rows
+			data.futureTimes.forEach((t, i) => {
+				const gap = Math.round(data.forecastGaps[i]);
+				html += `
+					<tr class="row-prediction">
+						<td style="color:var(--cyan)">T+${i+1}</td>
+						<td style="font-weight:bold">${secToTime(t)}</td>
+						<td>+${gap}s</td>
+						<td><span class="countdown-badge" id="cd-${i}">WAITING</span></td>
+					</tr>
+				`;
+			});
 
-			if (diffSec > 0 && diffSec <= threshold) {
-				const timeToArrival = Math.round(diffSec);
-				const predictedHMS = secondsToHMS(currentPredictedTimeSec);
-				
-				notificationElement.textContent = `PREDICTION ALERT: Next time (${predictedHMS}) in ${timeToArrival}s!`;
-				notificationElement.style.display = 'block';
-			} else {
-				notificationElement.style.display = 'none';
-			}
+			els.table.innerHTML = html;
+
+			// Store predictions for clock loop
+			predictions = data.futureTimes;
 		}
 
-		// --- Live Time Update Function ---
-		function updateLiveTime() {
-			const now = new Date();
-			const hh = String(now.getHours()).padStart(2, '0');
-			const mm = String(now.getMinutes()).padStart(2, '0');
-			const ss = String(now.getSeconds()).padStart(2, '0');
-			
-			if (liveTimeEl) {
-				liveTimeEl.textContent = `${hh}:${mm}:${ss}`;
-			}
+		// --- Main Loop & Events ---
+
+		function run() {
+			const text = els.input.value;
+			const lines = text.split('\n').filter(l => l.trim().length > 0);
+			const data = analyzeData(lines);
+			renderResults(data);
 		}
 
+		function updateClock() {
+			const now = new Date();
+			const nowSec = now.getHours()*3600 + now.getMinutes()*60 + now.getSeconds();
+			const timeStr = [now.getHours(), now.getMinutes(), now.getSeconds()]
+				.map(n => String(n).padStart(2,'0')).join(':');
+			
+			els.clock.textContent = timeStr;
 
-		calcBtn.addEventListener('click', ()=>{
-			const raw = timesInput.value.split('\n').map(x=>x.trim()).filter(x=>x);
-			const res = computePrediction(raw);
-			renderResult(res, raw);
+			// Update Countdowns in Table
+			if(predictions.length > 0) {
+				let nearestDiff = Infinity;
+
+				predictions.forEach((t, i) => {
+					const el = document.getElementById(`cd-${i}`);
+					if(!el) return;
+
+					let diff = t - nowSec;
+					if(diff < -40000) diff += 86400; // Handle midnight wrap forecast
+
+					if(diff > 0) {
+						el.textContent = `${Math.ceil(diff)}s`;
+						if(diff < nearestDiff) nearestDiff = diff;
+						
+						if(diff < 10) el.classList.add('imminent');
+						else el.classList.remove('imminent');
+					} else {
+						el.textContent = "PASSED";
+						el.classList.remove('imminent');
+						el.style.opacity = 0.5;
+					}
+				});
+
+				// Global Toast
+				if(nearestDiff < 10 && nearestDiff > 0) {
+					els.toast.classList.add('show');
+					els.toast.textContent = `NEXT EVENT: ${Math.ceil(nearestDiff)}s`;
+				} else {
+					els.toast.classList.remove('show');
+				}
+			}
+
+			requestAnimationFrame(updateClock);
+		}
+
+		// Event Listeners
+		els.analyzeBtn.addEventListener('click', run);
+		
+		els.clearBtn.addEventListener('click', () => {
+			els.input.value = '';
+			predictions = [];
+			els.results.style.display = 'none';
+			els.empty.style.display = 'flex';
+			els.toast.classList.remove('show');
 		});
 
-		addNow.addEventListener('click', ()=>{
+		els.markBtn.addEventListener('click', () => {
 			const now = new Date();
-			const hh = String(now.getHours()).padStart(2,'0');
-			const mm = String(now.getMinutes()).padStart(2,'0');
-			const ss = String(now.getSeconds()).padStart(2,'0');
-			const line = `${hh}:${mm}:${ss}`;
-			const cur = timesInput.value.trim();
-			// Only add if the current time isn't identical to the last line to prevent accidental duplicate clicks
-			const lastLine = cur.split('\n').pop().trim();
-			if (lastLine !== line) {
-				timesInput.value = cur ? (cur + '\n' + line) : line;
-				// Automatically re-calculate after adding a new time
-				calcBtn.click();
+			const t = [now.getHours(), now.getMinutes(), now.getSeconds()]
+				.map(n => String(n).padStart(2,'0')).join(':');
+			
+			const val = els.input.value.trim();
+			// No dupes
+			if(!val.endsWith(t)) {
+				els.input.value = val ? (val + '\n' + t) : t;
+				// If we have enough data, auto-analyze
+				if(els.input.value.split('\n').length > 1) run();
 			}
 		});
 
-		clearBtn.addEventListener('click', ()=>{
-			timesInput.value = '';
-			gapsArea.innerHTML = 'Enter times and click "Calculate & Predict".';
-			output.innerHTML = '';
-			resultArea.style.display = 'none';
-			sparkArea.innerHTML = '';
-			copyBtn.style.display = 'none';
-			currentPredictedTimeSec = null;
-		});
+		// Init
+		updateClock();
+		// Demo Data
+		setTimeout(() => {
+			els.input.value = "10:20:00\n10:25:00\n10:30:05\n10:35:10\n10:40:15";
+			run();
+		}, 500);
 
-		copyBtn.addEventListener('click', ()=>{
-			const pred = document.getElementById('predTime').textContent;
-			if(!pred) return;
-			// Use document.execCommand for better compatibility in environments where clipboard API might be restricted
-			const tempInput = document.createElement('textarea');
-			tempInput.value = pred;
-			document.body.appendChild(tempInput);
-			tempInput.select();
-			document.execCommand('copy');
-			document.body.removeChild(tempInput);
-
-			// Provide feedback
-			copyBtn.textContent = 'Copied!';
-			setTimeout(()=>{
-				copyBtn.textContent='Copy Prediction';
-			},1000);
-		});
-
-		// Auto-calc on load with demo data and start the real-time check
-		timesInput.value = `10:23:36\n10:24:56\n10:27:27\n10:29:07\n10:31:16\n10:32:55\n10:34:17\n10:36:44\n10:41:25`;
-		setTimeout(()=>{
-			calcBtn.click();
-			
-			// Start live time display and prediction check loop every 1 second
-			updateLiveTime();
-			setInterval(updateLiveTime, 1000);
-			setInterval(checkProximity, 1000);
-		},100);
 	</script>
 </body>
 </html>
