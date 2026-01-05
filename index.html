@@ -313,6 +313,7 @@
 	<script type="module">
 		// --- Firebase SDK Imports (v11.6.1 for stability) ---
 		import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+		import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
 		import { 
 			getAuth, 
 			signInAnonymously, 
@@ -322,7 +323,7 @@
 			signOut
 		} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 		
-		// --- Firebase Configuration (Updated for Aviator Time) ---
+		// --- Firebase Configuration ---
 		const firebaseConfig = {
 			apiKey: "AcbXX3KgvqD7B8Y4WjCu6yNx1Prfu5cNHz",
 			authDomain: "aviator-time-54227.firebaseapp.com",
@@ -355,7 +356,21 @@
 		// --- Firebase Initialization ---
 		function initializeFirebase() {
 			try {
-				const app = initializeApp(firebaseConfig);
+				let config = firebaseConfig;
+				
+				// Attempt to use the environment's auto-injected config if available
+				// This fixes issues where the hardcoded key is invalid but the environment works
+				if (typeof __firebase_config !== 'undefined') {
+					try {
+						config = JSON.parse(__firebase_config);
+						console.log("Using environment Firebase config");
+					} catch(e) {
+						console.warn("Error parsing __firebase_config, using fallback");
+					}
+				}
+
+				const app = initializeApp(config);
+				const analytics = getAnalytics(app);
 				auth = getAuth(app);
 				
 				// Set up initial authentication using custom token or anonymously
