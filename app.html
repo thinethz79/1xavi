@@ -4,25 +4,29 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width,initial-scale=1" />
 	<title>Temporal Rift Analyzer [PRO]</title>
-	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 	<style>
 		:root {
-			--bg-color: #0b0f14;
-			--panel-bg: #131923;
-			--cyan: #00e5ff;
-			--cyan-dim: rgba(0, 229, 255, 0.15);
-			--accent: #ffae00; /* Orange for alerts/highlights */
-			--success: #00ff9d;
-			--danger: #ff3333;
-			--text-main: #e0f7fa;
-			--text-muted: #6b7c93;
-			--border: 1px solid rgba(0, 229, 255, 0.2);
+			--bg-color: #050a10;
+			--panel-bg: rgba(10, 20, 35, 0.85);
+			--cyan: #00f3ff;
+			--purple: #bc13fe;
+			--green: #0aff0a;
+			--danger: #ff0033;
+			--grid-color: rgba(0, 243, 255, 0.1);
+			--text-main: #cceeff;
+			--text-muted: #5f7d8c;
+			--border: 1px solid rgba(0, 243, 255, 0.3);
 		}
 
 		* { box-sizing: border-box; }
 
 		body {
 			background-color: var(--bg-color);
+			background-image: 
+				linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+				linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+			background-size: 40px 40px;
 			color: var(--text-main);
 			font-family: 'Rajdhani', sans-serif;
 			margin: 0;
@@ -32,71 +36,87 @@
 			flex-direction: column;
 			align-items: center;
 			font-weight: 500;
+			overflow-x: hidden;
 		}
 
-		/* Professional Grid Background */
-		body::before {
-			content: "";
+		/* CRT Scanline Overlay */
+		body::after {
+			content: " ";
+			display: block;
 			position: fixed;
-			top: 0; left: 0; width: 100%; height: 100%;
-			background-image: 
-				linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
-				linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
-			background-size: 50px 50px;
-			z-index: -1;
+			top: 0; left: 0; bottom: 0; right: 0;
+			background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+			background-size: 100% 4px;
+			z-index: 999;
 			pointer-events: none;
 		}
 
 		.container {
 			width: 100%;
 			max-width: 1100px;
+			position: relative;
+			z-index: 10;
 		}
 
 		/* Header */
 		header {
 			display: flex;
 			justify-content: space-between;
-			align-items: center;
-			margin-bottom: 24px;
+			align-items: flex-end;
+			margin-bottom: 30px;
 			border-bottom: 2px solid var(--cyan);
-			padding-bottom: 12px;
+			padding-bottom: 10px;
+			position: relative;
+		}
+
+		header::before {
+			content: '';
+			position: absolute;
+			bottom: -6px;
+			left: 0;
+			width: 30px;
+			height: 10px;
+			background: var(--cyan);
 		}
 
 		h1 {
-			font-family: 'JetBrains Mono', monospace;
-			font-size: 24px;
+			font-family: 'Share Tech Mono', monospace;
+			font-size: 32px;
 			margin: 0;
 			text-transform: uppercase;
-			letter-spacing: -1px;
-			color: var(--cyan);
+			text-shadow: 0 0 10px var(--cyan);
+			letter-spacing: 2px;
+			color: #fff;
 		}
 
 		.badge {
-			background: var(--cyan);
-			color: #000;
-			font-size: 11px;
-			padding: 2px 6px;
-			border-radius: 2px;
-			margin-left: 8px;
-			font-weight: 700;
+			background: var(--purple);
+			color: #fff;
+			font-size: 12px;
+			padding: 2px 8px;
+			margin-left: 10px;
+			font-family: 'Share Tech Mono', monospace;
+			box-shadow: 0 0 10px var(--purple);
 			vertical-align: middle;
 		}
 
 		/* Live Clock */
 		.system-clock {
-			font-family: 'JetBrains Mono', monospace;
-			font-size: 18px;
-			color: var(--text-main);
-			background: rgba(0,0,0,0.3);
-			padding: 4px 12px;
-			border-left: 3px solid var(--accent);
+			font-family: 'Share Tech Mono', monospace;
+			font-size: 24px;
+			color: var(--cyan);
+			text-shadow: 0 0 8px var(--cyan);
+			border: 1px solid var(--cyan);
+			padding: 5px 15px;
+			background: rgba(0, 243, 255, 0.1);
+			box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
 		}
 
 		/* Main Interface */
 		.interface-grid {
 			display: grid;
 			grid-template-columns: 320px 1fr;
-			gap: 20px;
+			gap: 25px;
 		}
 
 		@media (max-width: 850px) {
@@ -106,21 +126,34 @@
 		/* Panels */
 		.panel {
 			background: var(--panel-bg);
-			border: var(--border);
-			padding: 0; /* padding handled by children */
+			border: 1px solid rgba(0, 243, 255, 0.3);
+			padding: 0; 
 			display: flex;
 			flex-direction: column;
+			position: relative;
+			box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+			backdrop-filter: blur(5px);
+		}
+		
+		/* Tech Decoration Corner */
+		.panel::after {
+			content: '';
+			position: absolute;
+			top: 0; right: 0;
+			border-top: 20px solid var(--cyan);
+			border-left: 20px solid transparent;
+			opacity: 0.5;
 		}
 
 		.panel-header {
-			background: rgba(0, 229, 255, 0.05);
-			padding: 10px 16px;
-			font-size: 13px;
+			background: rgba(0, 243, 255, 0.05);
+			padding: 12px 16px;
+			font-size: 14px;
 			text-transform: uppercase;
 			letter-spacing: 1px;
 			color: var(--cyan);
-			border-bottom: var(--border);
-			font-family: 'JetBrains Mono', monospace;
+			border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+			font-family: 'Share Tech Mono', monospace;
 			display: flex;
 			justify-content: space-between;
 		}
@@ -134,23 +167,26 @@
 		textarea {
 			width: 100%;
 			height: 300px;
-			background: #080c11;
-			border: 1px solid #2c3e50;
-			color: #fff;
-			font-family: 'JetBrains Mono', monospace;
-			font-size: 14px;
-			padding: 12px;
+			background: rgba(0, 0, 0, 0.3);
+			border: 1px solid #334;
+			color: var(--cyan);
+			font-family: 'Share Tech Mono', monospace;
+			font-size: 16px;
+			padding: 15px;
 			resize: none;
 			outline: none;
-			line-height: 1.5;
+			transition: all 0.3s;
 		}
-		textarea:focus { border-color: var(--cyan); }
+		textarea:focus {
+			border-color: var(--cyan);
+			box-shadow: 0 0 15px rgba(0, 243, 255, 0.1) inset;
+		}
 
 		.controls {
 			display: grid;
 			grid-template-columns: 1fr 1fr;
-			gap: 8px;
-			margin-top: 12px;
+			gap: 10px;
+			margin-top: 15px;
 		}
 
 		button {
@@ -158,20 +194,42 @@
 			border: 1px solid var(--cyan);
 			color: var(--cyan);
 			padding: 10px;
-			font-family: 'JetBrains Mono', monospace;
-			font-size: 12px;
+			font-family: 'Share Tech Mono', monospace;
+			font-size: 14px;
 			text-transform: uppercase;
 			cursor: pointer;
 			transition: 0.2s;
-			font-weight: bold;
+			position: relative;
+			overflow: hidden;
 		}
 
-		button:hover { background: var(--cyan-dim); }
-		button.primary { background: var(--cyan); color: #000; }
-		button.primary:hover { background: #fff; box-shadow: 0 0 15px var(--cyan); }
+		button:hover {
+			background: var(--cyan);
+			color: #000;
+			box-shadow: 0 0 15px var(--cyan);
+		}
 		
-		button.action-add { grid-column: span 2; border-color: var(--text-muted); color: var(--text-muted); }
-		button.action-add:hover { border-color: var(--text-main); color: var(--text-main); background: rgba(255,255,255,0.05); }
+		button.primary {
+			background: rgba(0, 243, 255, 0.1);
+			font-weight: bold;
+			border-width: 2px;
+		}
+		button.primary:hover {
+			background: var(--cyan);
+			color: #000;
+		}
+		
+		button.action-add { 
+			grid-column: span 2; 
+			border-color: var(--text-muted); 
+			color: var(--text-muted); 
+		}
+		button.action-add:hover { 
+			border-color: #fff; 
+			color: #fff; 
+			background: rgba(255,255,255,0.1); 
+			box-shadow: none;
+		}
 
 		/* Results Area */
 		.dashboard {
@@ -189,8 +247,8 @@
 		}
 
 		.metric-card {
-			background: rgba(0,0,0,0.2);
-			border: 1px solid rgba(255,255,255,0.05);
+			background: rgba(0,0,0,0.3);
+			border-left: 2px solid var(--purple);
 			padding: 10px;
 		}
 
@@ -200,12 +258,14 @@
 			text-transform: uppercase;
 			letter-spacing: 0.5px;
 			margin-bottom: 4px;
+			font-family: 'Share Tech Mono', monospace;
 		}
 
 		.metric-value {
-			font-family: 'JetBrains Mono', monospace;
-			font-size: 18px;
-			color: var(--text-main);
+			font-family: 'Share Tech Mono', monospace;
+			font-size: 20px;
+			color: #fff;
+			text-shadow: 0 0 5px rgba(255,255,255,0.3);
 		}
 
 		.metric-value.highlight { color: var(--cyan); }
@@ -219,26 +279,43 @@
 		}
 		.confidence-track {
 			flex: 1;
-			height: 4px;
-			background: #333;
+			height: 6px;
+			background: rgba(0,0,0,0.5);
 			position: relative;
+			border: 1px solid #333;
 		}
 		.confidence-fill {
 			height: 100%;
-			background: var(--success);
+			background: var(--purple);
 			width: 0%;
+			box-shadow: 0 0 10px var(--purple);
 			transition: width 0.5s ease;
 		}
 
 		/* Visualizer */
 		.vis-wrapper {
-			height: 80px;
-			background: #080c11;
-			border: var(--border);
+			height: 100px;
+			background: rgba(0,0,0,0.4);
+			border: 1px solid rgba(0, 243, 255, 0.2);
 			position: relative;
 			overflow: hidden;
 		}
 		canvas { width: 100%; height: 100%; display: block; }
+		
+		.vis-scanline {
+			position: absolute;
+			top: 0; left: 0; width: 2px; bottom: 0;
+			background: var(--cyan);
+			box-shadow: 0 0 10px var(--cyan);
+			animation: scan 3s linear infinite;
+			pointer-events: none;
+		}
+		@keyframes scan {
+			0% { left: 0%; opacity: 0;}
+			10% { opacity: 1; }
+			90% { opacity: 1; }
+			100% { left: 100%; opacity: 0; }
+		}
 
 		/* Prediction Table */
 		.forecast-table {
@@ -249,44 +326,48 @@
 		
 		.forecast-table th {
 			text-align: left;
-			font-size: 11px;
+			font-size: 12px;
 			color: var(--text-muted);
 			padding: 8px;
-			border-bottom: 1px solid rgba(255,255,255,0.1);
-			font-family: 'JetBrains Mono', monospace;
+			border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+			font-family: 'Share Tech Mono', monospace;
+			background: rgba(0, 243, 255, 0.05);
 		}
 
 		.forecast-table td {
 			padding: 10px 8px;
-			font-size: 15px;
+			font-size: 16px;
 			border-bottom: 1px solid rgba(255,255,255,0.05);
-			font-family: 'JetBrains Mono', monospace;
+			font-family: 'Share Tech Mono', monospace;
 		}
 
 		.row-prediction {
-			background: rgba(0, 229, 255, 0.03);
+			background: rgba(188, 19, 254, 0.05);
 		}
 		.row-prediction td {
-			color: var(--cyan);
+			color: var(--purple);
+			text-shadow: 0 0 5px rgba(188, 19, 254, 0.4);
 		}
 
 		.countdown-badge {
 			display: inline-block;
 			font-size: 12px;
 			padding: 2px 6px;
-			border-radius: 4px;
-			background: rgba(0,0,0,0.4);
-			border: 1px solid rgba(255,255,255,0.1);
+			border: 1px solid var(--text-muted);
 			min-width: 60px;
 			text-align: center;
+			color: var(--text-muted);
 		}
 		.countdown-badge.imminent {
 			border-color: var(--danger);
-			color: var(--danger);
+			color: #000;
+			background: var(--danger);
+			box-shadow: 0 0 10px var(--danger);
+			font-weight: bold;
 			animation: pulse 1s infinite;
 		}
 		
-		@keyframes pulse { 50% { opacity: 0.5; } }
+		@keyframes pulse { 50% { opacity: 0.7; transform: scale(0.95); } }
 
 		/* Status Bar */
 		.status-bar {
@@ -295,8 +376,9 @@
 			color: var(--text-muted);
 			display: flex;
 			justify-content: space-between;
-			border-top: 1px solid rgba(255,255,255,0.05);
+			border-top: 1px solid rgba(0, 243, 255, 0.2);
 			padding-top: 10px;
+			font-family: 'Share Tech Mono', monospace;
 		}
 
 		/* Empty State */
@@ -307,31 +389,39 @@
 			height: 100%;
 			color: var(--text-muted);
 			font-style: italic;
+			font-family: 'Share Tech Mono', monospace;
 			background: repeating-linear-gradient(
 				45deg,
 				rgba(0,0,0,0),
 				rgba(0,0,0,0) 10px,
-				rgba(255,255,255,0.02) 10px,
-				rgba(255,255,255,0.02) 20px
+				rgba(0, 243, 255,0.02) 10px,
+				rgba(0, 243, 255,0.02) 20px
 			);
 		}
+
+		/* Scramble Class */
+		.scramble { display: inline-block; }
 
 		/* Floating Alert */
 		#toast {
 			position: fixed;
-			top: 20px;
-			left: 50%;
-			transform: translateX(-50%) translateY(-100px);
-			background: var(--accent);
+			top: 0; left: 0; right: 0;
+			height: 80px;
+			background: rgba(255, 0, 50, 0.9);
+			z-index: 2000;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-family: 'Share Tech Mono', monospace;
+			font-size: 32px;
 			color: #000;
-			padding: 10px 20px;
-			font-family: 'JetBrains Mono', monospace;
 			font-weight: bold;
-			z-index: 100;
-			box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-			transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+			text-transform: uppercase;
+			transform: translateY(-100%);
+			transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+			box-shadow: 0 5px 20px #ff0033;
 		}
-		#toast.show { transform: translateX(-50%) translateY(0); }
+		#toast.show { transform: translateY(0); }
 
 	</style>
 </head>
@@ -342,7 +432,8 @@
 	<div class="container">
 		<header>
 			<div>
-				<h1>Temporal Rift Analyzer <span class="badge">PRO</span></h1>
+				<h1>Temporal Rift Analyzer <span class="badge">PRO v2.0</span></h1>
+				<div style="font-size:12px; color:var(--cyan); opacity:0.7; font-family:'Share Tech Mono';">ADVANCED PATTERN DECRYPTION MATRIX</div>
 			</div>
 			<div class="system-clock" id="clock">00:00:00</div>
 		</header>
@@ -352,15 +443,18 @@
 			<!-- Left Column: Input -->
 			<div class="panel">
 				<div class="panel-header">
-					<span>Source Data</span>
+					<span>Source Stream</span>
 					<span>TXT-IN</span>
 				</div>
 				<div class="panel-body">
-					<textarea id="inputArea" placeholder="10:23:36&#10;10:24:56&#10;10:27:27" spellcheck="false"></textarea>
+					<textarea id="inputArea" placeholder="INPUT TEMPORAL COORDINATES...
+10:23:36
+10:24:56
+10:27:27" spellcheck="false"></textarea>
 					<div class="controls">
-						<button class="primary" id="analyzeBtn">Analyze Pattern</button>
-						<button id="clearBtn">Clear</button>
-						<button class="action-add" id="markNowBtn">+ Mark Current Time</button>
+						<button class="primary" id="analyzeBtn">Initialize Decryption</button>
+						<button id="clearBtn">Purge</button>
+						<button class="action-add" id="markNowBtn">Mark Current Sequence</button>
 					</div>
 				</div>
 			</div>
@@ -368,8 +462,8 @@
 			<!-- Right Column: Analysis -->
 			<div class="panel">
 				<div class="panel-header">
-					<span>Analysis & Forecast</span>
-					<span id="patternType">NO DATA</span>
+					<span>Analysis Core</span>
+					<span id="patternType" class="scramble">AWAITING DATA</span>
 				</div>
 				<div class="panel-body" style="padding: 0;">
 					
@@ -379,14 +473,14 @@
 						<!-- Top Metrics -->
 						<div class="metrics-row">
 							<div class="metric-card">
-								<div class="metric-label">Pattern Confidence</div>
+								<div class="metric-label">Integrity</div>
 								<div class="confidence-container">
 									<div class="metric-value highlight" id="confidenceVal">--%</div>
 									<div class="confidence-track"><div class="confidence-fill" id="confidenceBar"></div></div>
 								</div>
 							</div>
 							<div class="metric-card">
-								<div class="metric-label">Mean Gap</div>
+								<div class="metric-label">Mean Interval</div>
 								<div class="metric-value" id="meanGap">--</div>
 							</div>
 							<div class="metric-card">
@@ -397,16 +491,17 @@
 
 						<!-- Visualizer -->
 						<div>
-							<div class="metric-label" style="margin-bottom: 5px;">Interval Waveform</div>
+							<div class="metric-label" style="margin-bottom: 5px;">Temporal Waveform</div>
 							<div class="vis-wrapper">
 								<canvas id="canvas"></canvas>
+								<div class="vis-scanline"></div>
 							</div>
 						</div>
 
 						<!-- Table -->
 						<div style="flex: 1; overflow: hidden; display: flex; flex-direction: column;">
-							<div class="metric-label" style="margin-bottom: 5px;">Sequence Forecast</div>
-							<div style="overflow-y: auto; border: 1px solid rgba(255,255,255,0.1);">
+							<div class="metric-label" style="margin-bottom: 5px;">Sequence Projection</div>
+							<div style="overflow-y: auto; border: 1px solid rgba(0, 243, 255, 0.2);">
 								<table class="forecast-table">
 									<thead>
 										<tr>
@@ -424,7 +519,7 @@
 						</div>
 
 						<div class="status-bar">
-							<span id="algoName">Algorithm: Awaiting Input</span>
+							<span id="algoName">ALGO: STANDBY</span>
 							<span>LIVE MONITORING ACTIVE</span>
 						</div>
 
@@ -432,7 +527,7 @@
 
 					<!-- Empty State -->
 					<div id="emptyState" class="empty-state">
-						ENTER TIMESTAMPS TO BEGIN SEQUENCE DECRYPTION
+						AWAITING INPUT TO BEGIN SEQUENCE DECRYPTION
 					</div>
 
 				</div>
@@ -486,6 +581,34 @@
 			return `${h}:${m}:${s}`;
 		}
 
+		// --- FX: Scramble Text ---
+		function scrambleText(element, finalText, duration = 800) {
+			const chars = 'AcbXX3KgvqD7B8Y4WjCu6yNx1Prfu5cNHz!@#$%^&*()';
+			let start = Date.now();
+			
+			function update() {
+				let elapsed = Date.now() - start;
+				let progress = elapsed / duration;
+				
+				if (progress >= 1) {
+					element.textContent = finalText;
+					return;
+				}
+
+				let scrambled = '';
+				for (let i = 0; i < finalText.length; i++) {
+					if (i / finalText.length < progress) {
+						scrambled += finalText[i];
+					} else {
+						scrambled += chars[Math.floor(Math.random() * chars.length)];
+					}
+				}
+				element.textContent = scrambled;
+				requestAnimationFrame(update);
+			}
+			update();
+		}
+
 		// --- Advanced Analysis Engine ---
 
 		function analyzeData(rawLines) {
@@ -496,7 +619,6 @@
 			const gaps = [];
 			for(let i=1; i<seconds.length; i++) {
 				let g = seconds[i] - seconds[i-1];
-				// Handle midnight crossing (if gap is negative, add 24h)
 				if (g < -40000) g += 86400; 
 				gaps.push(g);
 			}
@@ -506,19 +628,14 @@
 			let bestPeriod = 0;
 			let bestError = Infinity;
 
-			// We need at least (period * 2) gaps to verify a pattern effectively, 
-			// but for small data we can try minimal overlapping.
 			for (let p = 1; p <= 4; p++) {
-				if (gaps.length < p + 1) break; // Need enough data
+				if (gaps.length < p + 1) break; 
 
 				let errorSum = 0;
 				let count = 0;
 				
-				// Compare gap[i] with gap[i-p]
-				// We weight recent errors more heavily
 				for (let i = p; i < gaps.length; i++) {
 					const diff = Math.abs(gaps[i] - gaps[i-p]);
-					// Weighting: newer data points (higher i) count more
 					const weight = 1 + (i / gaps.length); 
 					errorSum += diff * weight;
 					count += weight;
@@ -532,13 +649,12 @@
 			}
 
 			// 2. Check for Linear Drift (Acceleration)
-			// Calculate 'acceleration' (diff of gaps)
 			let driftSum = 0;
 			if (gaps.length >= 2) {
 				for(let i=1; i<gaps.length; i++) driftSum += (gaps[i] - gaps[i-1]);
 			}
 			const avgDrift = gaps.length >= 2 ? driftSum / (gaps.length - 1) : 0;
-			const isDrifting = Math.abs(avgDrift) > 2; // Threshold for considering it drift
+			const isDrifting = Math.abs(avgDrift) > 2; 
 
 			// --- Decision Logic ---
 			
@@ -549,64 +665,46 @@
 
 			const meanGap = gaps.reduce((a,b)=>a+b,0) / gaps.length;
 
-			// Heuristic Scoring
-			// Normalize error relative to the magnitude of the gap
 			const relError = bestError / (meanGap || 1); 
 
 			if (gaps.length < 3) {
-				// Fallback for tiny data: Simple average
+				// Fallback
 				const last = gaps[gaps.length-1];
 				forecastGaps = [last, last, last];
 				patternName = "INSUFFICIENT DATA";
-				algorithmUsed = "Last Value Projection";
+				algorithmUsed = "LAST VALUE PROJECTION";
 				confidence = 50;
 			} else if (isDrifting && relError > 0.1) {
-				// Drift is dominant and pattern is weak
+				// Drift
 				patternName = "LINEAR DRIFT";
-				algorithmUsed = `Linear Regression (Drift: ${avgDrift > 0 ? '+' : ''}${Math.round(avgDrift)}s)`;
+				algorithmUsed = `LINEAR REGRESSION [${avgDrift > 0 ? '+' : ''}${Math.round(avgDrift)}s]`;
 				const lastGap = gaps[gaps.length-1];
 				forecastGaps = [
 					lastGap + avgDrift,
 					lastGap + avgDrift*2,
 					lastGap + avgDrift*3
 				];
-				// Confidence based on consistency of drift
 				confidence = 70; 
 			} else {
 				// Pattern Based
 				if (bestPeriod === 1) patternName = "FIXED INTERVAL";
 				else if (bestPeriod === 2) patternName = "ALTERNATING CYCLE";
-				else patternName = `COMPLEX CYCLE (${bestPeriod}-STEP)`;
+				else patternName = `COMPLEX CYCLE [${bestPeriod}-STEP]`;
 
-				algorithmUsed = `Pattern Match (Period: ${bestPeriod})`;
+				algorithmUsed = `PATTERN MATCH [PERIOD: ${bestPeriod}]`;
 				
-				// Generate next 3 gaps based on pattern
-				// We project: next is matching index - Period
 				for (let k = 1; k <= 3; k++) {
-					// Use modulo logic to find which step in the cycle corresponds to the future
-					// The index in gaps for the next prediction would be gaps.length
-					// The corresponding past index is gaps.length - bestPeriod
-					// For T+k: index is gaps.length + (k-1)
-					// So we look back: (gaps.length + k - 1) % bestPeriod ? 
-					// Actually simpler: just repeat the last 'bestPeriod' gaps.
-					
-					// Get the gap from 'bestPeriod' steps ago relative to the new position
-					// We need to fetch from the end of the array, wrapping around the period.
 					const sourceIndex = gaps.length - bestPeriod + ((k-1) % bestPeriod);
-					// If sourceIndex is valid
 					if(sourceIndex >= 0) {
 						forecastGaps.push(gaps[sourceIndex]);
 					} else {
-						forecastGaps.push(meanGap); // Fallback
+						forecastGaps.push(meanGap); 
 					}
 				}
 
-				// Confidence Calculation (Inverse of error)
-				// relError 0.0 -> 100%, 0.2 -> 60%, 0.5 -> 0%
 				confidence = Math.max(0, Math.min(100, 100 - (relError * 200)));
 			}
 
-			// Round confidence
 			confidence = Math.round(confidence);
 
 			// Calculate Future Timestamps
@@ -643,22 +741,35 @@
 			
 			if(!gaps.length) return;
 
-			const max = Math.max(...gaps) * 1.1;
-			const min = Math.min(...gaps) * 0.9;
-			const range = max - min || 1;
+			const max = Math.max(...gaps) * 1.2;
+			const min = 0; // Baseline 0 makes waves look more dramatic
 			
 			const stepX = w / (gaps.length - 1 || 1);
 
-			// Draw path
+			// Draw Fill
+			ctx.beginPath();
+			ctx.moveTo(0, h);
+			gaps.forEach((g, i) => {
+				const x = i * stepX;
+				const y = h - ((g / max) * h); // Scale from bottom
+				ctx.lineTo(x,y);
+			});
+			ctx.lineTo(w, h);
+			const grad = ctx.createLinearGradient(0,0,0,h);
+			grad.addColorStop(0, 'rgba(188, 19, 254, 0.4)');
+			grad.addColorStop(1, 'rgba(188, 19, 254, 0)');
+			ctx.fillStyle = grad;
+			ctx.fill();
+			
+			// Draw Line
 			ctx.beginPath();
 			gaps.forEach((g, i) => {
 				const x = i * stepX;
-				const y = h - ((g - min) / range) * h;
+				const y = h - ((g / max) * h);
 				if(i===0) ctx.moveTo(x,y);
 				else ctx.lineTo(x,y);
 			});
-			
-			ctx.strokeStyle = '#00e5ff';
+			ctx.strokeStyle = '#00f3ff';
 			ctx.lineWidth = 2;
 			ctx.stroke();
 
@@ -666,7 +777,7 @@
 			ctx.fillStyle = '#fff';
 			gaps.forEach((g, i) => {
 				const x = i * stepX;
-				const y = h - ((g - min) / range) * h;
+				const y = h - ((g / max) * h);
 				ctx.beginPath();
 				ctx.arc(x, y, 3, 0, Math.PI*2);
 				ctx.fill();
@@ -681,19 +792,19 @@
 			}
 
 			els.empty.style.display = 'none';
-			els.results.style.display = 'flex'; // Changed to flex to support the structure
+			els.results.style.display = 'flex'; 
 
-			// Update Metrics
-			els.metrics.pattern.textContent = data.patternName;
-			els.metrics.pattern.style.color = data.confidence > 80 ? 'var(--success)' : (data.confidence < 40 ? 'var(--danger)' : 'var(--cyan)');
+			// Update Metrics with effects
+			scrambleText(els.metrics.pattern, data.patternName);
+			els.metrics.pattern.style.color = data.confidence > 80 ? 'var(--green)' : 'var(--cyan)';
 			
 			els.metrics.confVal.textContent = data.confidence + '%';
 			els.metrics.confBar.style.width = data.confidence + '%';
-			els.metrics.confBar.style.backgroundColor = data.confidence > 70 ? 'var(--success)' : (data.confidence < 40 ? 'var(--danger)' : 'var(--accent)');
+			els.metrics.confBar.style.backgroundColor = data.confidence > 70 ? 'var(--green)' : (data.confidence < 40 ? 'var(--danger)' : 'var(--purple)');
 
 			els.metrics.mean.textContent = Math.round(data.meanGap) + 's';
 			els.metrics.drift.textContent = Math.round(data.avgDrift) + 's';
-			els.metrics.algo.textContent = "ALGO: " + data.algorithmUsed;
+			els.metrics.algo.textContent = data.algorithmUsed;
 
 			// Draw Wave
 			drawWaveform(data.gaps);
@@ -710,7 +821,7 @@
 						<td style="color:var(--text-muted)">#${String(i+1).padStart(2,'0')}</td>
 						<td>${secToTime(data.seconds[i])}</td>
 						<td style="color:var(--text-muted)">${gapStr}</td>
-						<td style="font-size:11px; color:var(--text-muted)">RECORDED</td>
+						<td style="font-size:11px; color:var(--text-muted)">ARCHIVED</td>
 					</tr>
 				`;
 			}
@@ -720,7 +831,7 @@
 				const gap = Math.round(data.forecastGaps[i]);
 				html += `
 					<tr class="row-prediction">
-						<td style="color:var(--cyan)">T+${i+1}</td>
+						<td style="color:var(--purple)">T+${i+1}</td>
 						<td style="font-weight:bold">${secToTime(t)}</td>
 						<td>+${gap}s</td>
 						<td><span class="countdown-badge" id="cd-${i}">WAITING</span></td>
@@ -778,7 +889,7 @@
 				// Global Toast
 				if(nearestDiff < 10 && nearestDiff > 0) {
 					els.toast.classList.add('show');
-					els.toast.textContent = `NEXT EVENT: ${Math.ceil(nearestDiff)}s`;
+					els.toast.textContent = `IMMINENT EVENT: ${Math.ceil(nearestDiff)}s`;
 				} else {
 					els.toast.classList.remove('show');
 				}
