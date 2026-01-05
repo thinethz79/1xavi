@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width,initial-scale=1" />
-	<title>Temporal Rift Analyzer [PRO]</title>
+	<title>Secure Access Terminal</title>
 	<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 	<style>
 		:root {
@@ -13,10 +13,8 @@
 			--purple: #bc13fe;
 			--green: #0aff0a;
 			--danger: #ff0033;
-			--grid-color: rgba(0, 243, 255, 0.1);
 			--text-main: #cceeff;
 			--text-muted: #5f7d8c;
-			--border: 1px solid rgba(0, 243, 255, 0.3);
 		}
 
 		* { box-sizing: border-box; }
@@ -35,7 +33,7 @@
 			display: flex;
 			flex-direction: column;
 			align-items: center;
-			font-weight: 500;
+			justify-content: center;
 			overflow-x: hidden;
 		}
 
@@ -53,884 +51,470 @@
 
 		.container {
 			width: 100%;
-			max-width: 1100px;
+			max-width: 480px;
 			position: relative;
 			z-index: 10;
 		}
 
-		/* Header */
-		header {
-			display: flex;
-			justify-content: space-between;
-			align-items: flex-end;
-			margin-bottom: 30px;
-			border-bottom: 2px solid var(--cyan);
-			padding-bottom: 10px;
-			position: relative;
-		}
-
-		header::before {
-			content: '';
-			position: absolute;
-			bottom: -6px;
-			left: 0;
-			width: 30px;
-			height: 10px;
-			background: var(--cyan);
-		}
-
-		h1 {
-			font-family: 'Share Tech Mono', monospace;
-			font-size: 32px;
-			margin: 0;
-			text-transform: uppercase;
-			text-shadow: 0 0 10px var(--cyan);
-			letter-spacing: 2px;
-			color: #fff;
-		}
-
-		.badge {
-			background: var(--purple);
-			color: #fff;
-			font-size: 12px;
-			padding: 2px 8px;
-			margin-left: 10px;
-			font-family: 'Share Tech Mono', monospace;
-			box-shadow: 0 0 10px var(--purple);
-			vertical-align: middle;
-		}
-
-		/* Live Clock */
-		.system-clock {
-			font-family: 'Share Tech Mono', monospace;
-			font-size: 24px;
-			color: var(--cyan);
-			text-shadow: 0 0 8px var(--cyan);
-			border: 1px solid var(--cyan);
-			padding: 5px 15px;
-			background: rgba(0, 243, 255, 0.1);
-			box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
-		}
-
-		/* Main Interface */
-		.interface-grid {
-			display: grid;
-			grid-template-columns: 320px 1fr;
-			gap: 25px;
-		}
-
-		@media (max-width: 850px) {
-			.interface-grid { grid-template-columns: 1fr; }
-		}
-
-		/* Panels */
+		/* Panel Styles */
 		.panel {
 			background: var(--panel-bg);
 			border: 1px solid rgba(0, 243, 255, 0.3);
-			padding: 0; 
+			padding: 30px;
+			position: relative;
+			box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+			backdrop-filter: blur(5px);
 			display: flex;
 			flex-direction: column;
-			position: relative;
-			box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-			backdrop-filter: blur(5px);
+			gap: 20px;
 		}
-		
+
 		/* Tech Decoration Corner */
 		.panel::after {
 			content: '';
 			position: absolute;
-			top: 0; right: 0;
+			top: -1px; right: -1px;
 			border-top: 20px solid var(--cyan);
 			border-left: 20px solid transparent;
-			opacity: 0.5;
+			opacity: 0.8;
+		}
+		.panel::before {
+			content: '';
+			position: absolute;
+			bottom: -1px; left: -1px;
+			border-bottom: 20px solid var(--purple);
+			border-right: 20px solid transparent;
+			opacity: 0.8;
 		}
 
-		.panel-header {
-			background: rgba(0, 243, 255, 0.05);
-			padding: 12px 16px;
-			font-size: 14px;
-			text-transform: uppercase;
-			letter-spacing: 1px;
-			color: var(--cyan);
-			border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+		h2 {
 			font-family: 'Share Tech Mono', monospace;
-			display: flex;
-			justify-content: space-between;
+			font-size: 28px;
+			margin: 0;
+			text-transform: uppercase;
+			text-align: center;
+			color: #fff;
+			text-shadow: 0 0 10px var(--cyan);
+			letter-spacing: 2px;
 		}
 
-		.panel-body {
-			padding: 16px;
-			flex: 1;
+		p.status {
+			text-align: center;
+			font-family: 'Share Tech Mono', monospace;
+			font-size: 14px;
+			color: var(--cyan);
+			opacity: 0.8;
+			margin: 0;
 		}
 
-		/* Input Area */
-		textarea {
+		/* Inputs */
+		input {
 			width: 100%;
-			height: 300px;
-			background: rgba(0, 0, 0, 0.3);
+			background: rgba(0, 0, 0, 0.4);
 			border: 1px solid #334;
 			color: var(--cyan);
 			font-family: 'Share Tech Mono', monospace;
 			font-size: 16px;
 			padding: 15px;
-			resize: none;
 			outline: none;
 			transition: all 0.3s;
+			margin-bottom: 15px;
+			display: block;
 		}
-		textarea:focus {
+		
+		input:focus {
 			border-color: var(--cyan);
-			box-shadow: 0 0 15px rgba(0, 243, 255, 0.1) inset;
+			box-shadow: 0 0 15px rgba(0, 243, 255, 0.2) inset;
 		}
 
-		.controls {
-			display: grid;
-			grid-template-columns: 1fr 1fr;
-			gap: 10px;
-			margin-top: 15px;
+		input::placeholder {
+			color: rgba(95, 125, 140, 0.6);
 		}
 
+		/* Buttons */
 		button {
+			width: 100%;
 			background: transparent;
 			border: 1px solid var(--cyan);
 			color: var(--cyan);
-			padding: 10px;
+			padding: 15px;
 			font-family: 'Share Tech Mono', monospace;
-			font-size: 14px;
+			font-size: 16px;
 			text-transform: uppercase;
 			cursor: pointer;
 			transition: 0.2s;
 			position: relative;
 			overflow: hidden;
+			margin-bottom: 10px;
+			font-weight: bold;
+			letter-spacing: 1px;
 		}
 
 		button:hover {
 			background: var(--cyan);
 			color: #000;
-			box-shadow: 0 0 15px var(--cyan);
+			box-shadow: 0 0 20px var(--cyan);
 		}
 		
 		button.primary {
 			background: rgba(0, 243, 255, 0.1);
-			font-weight: bold;
 			border-width: 2px;
 		}
-		button.primary:hover {
-			background: var(--cyan);
-			color: #000;
-		}
 		
-		button.action-add { 
-			grid-column: span 2; 
-			border-color: var(--text-muted); 
-			color: var(--text-muted); 
+		button.ghost {
+			border-color: var(--text-muted);
+			color: var(--text-muted);
 		}
-		button.action-add:hover { 
-			border-color: #fff; 
-			color: #fff; 
-			background: rgba(255,255,255,0.1); 
+		button.ghost:hover {
+			border-color: #fff;
+			color: #fff;
+			background: rgba(255,255,255,0.1);
 			box-shadow: none;
 		}
 
-		/* Results Area */
-		.dashboard {
-			display: flex;
-			flex-direction: column;
-			gap: 20px;
-			height: 100%;
+		button.danger {
+			border-color: var(--danger);
+			color: var(--danger);
 		}
-
-		/* Top Metrics */
-		.metrics-row {
-			display: grid;
-			grid-template-columns: repeat(3, 1fr);
-			gap: 12px;
-		}
-
-		.metric-card {
-			background: rgba(0,0,0,0.3);
-			border-left: 2px solid var(--purple);
-			padding: 10px;
-		}
-
-		.metric-label {
-			font-size: 11px;
-			color: var(--text-muted);
-			text-transform: uppercase;
-			letter-spacing: 0.5px;
-			margin-bottom: 4px;
-			font-family: 'Share Tech Mono', monospace;
-		}
-
-		.metric-value {
-			font-family: 'Share Tech Mono', monospace;
-			font-size: 20px;
+		button.danger:hover {
+			background: var(--danger);
 			color: #fff;
-			text-shadow: 0 0 5px rgba(255,255,255,0.3);
+			box-shadow: 0 0 20px var(--danger);
 		}
 
-		.metric-value.highlight { color: var(--cyan); }
-		
-		/* Confidence Bar */
-		.confidence-container {
-			display: flex;
-			align-items: center;
-			gap: 8px;
-			margin-top: 4px;
-		}
-		.confidence-track {
-			flex: 1;
-			height: 6px;
-			background: rgba(0,0,0,0.5);
-			position: relative;
-			border: 1px solid #333;
-		}
-		.confidence-fill {
-			height: 100%;
-			background: var(--purple);
-			width: 0%;
-			box-shadow: 0 0 10px var(--purple);
-			transition: width 0.5s ease;
-		}
-
-		/* Visualizer */
-		.vis-wrapper {
-			height: 100px;
-			background: rgba(0,0,0,0.4);
-			border: 1px solid rgba(0, 243, 255, 0.2);
-			position: relative;
-			overflow: hidden;
-		}
-		canvas { width: 100%; height: 100%; display: block; }
-		
-		.vis-scanline {
-			position: absolute;
-			top: 0; left: 0; width: 2px; bottom: 0;
-			background: var(--cyan);
-			box-shadow: 0 0 10px var(--cyan);
-			animation: scan 3s linear infinite;
+		button:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
 			pointer-events: none;
 		}
-		@keyframes scan {
-			0% { left: 0%; opacity: 0;}
-			10% { opacity: 1; }
-			90% { opacity: 1; }
-			100% { left: 100%; opacity: 0; }
-		}
 
-		/* Prediction Table */
-		.forecast-table {
-			width: 100%;
-			border-collapse: collapse;
-			margin-top: 0;
-		}
+		/* Utilities */
+		.hidden { display: none !important; }
 		
-		.forecast-table th {
-			text-align: left;
-			font-size: 12px;
-			color: var(--text-muted);
-			padding: 8px;
-			border-bottom: 1px solid rgba(0, 243, 255, 0.2);
-			font-family: 'Share Tech Mono', monospace;
-			background: rgba(0, 243, 255, 0.05);
-		}
-
-		.forecast-table td {
-			padding: 10px 8px;
-			font-size: 16px;
-			border-bottom: 1px solid rgba(255,255,255,0.05);
-			font-family: 'Share Tech Mono', monospace;
-		}
-
-		.row-prediction {
-			background: rgba(188, 19, 254, 0.05);
-		}
-		.row-prediction td {
-			color: var(--purple);
-			text-shadow: 0 0 5px rgba(188, 19, 254, 0.4);
-		}
-
-		.countdown-badge {
-			display: inline-block;
-			font-size: 12px;
-			padding: 2px 6px;
-			border: 1px solid var(--text-muted);
-			min-width: 60px;
+		.error-box {
+			color: var(--danger);
+			font-size: 13px;
+			padding: 10px;
+			background: rgba(255, 0, 50, 0.1);
+			border: 1px solid var(--danger);
 			text-align: center;
-			color: var(--text-muted);
+			font-family: 'Share Tech Mono', monospace;
+			margin-top: 10px;
 		}
-		.countdown-badge.imminent {
-			border-color: var(--danger);
-			color: #000;
-			background: var(--danger);
-			box-shadow: 0 0 10px var(--danger);
-			font-weight: bold;
-			animation: pulse 1s infinite;
-		}
-		
-		@keyframes pulse { 50% { opacity: 0.7; transform: scale(0.95); } }
 
-		/* Status Bar */
-		.status-bar {
-			margin-top: auto;
-			font-size: 12px;
-			color: var(--text-muted);
+		.success-text {
+			color: var(--green);
+			text-align: center;
+			margin-bottom: 10px;
+			font-size: 18px;
+			text-shadow: 0 0 5px var(--green);
+		}
+
+		.info-row {
 			display: flex;
 			justify-content: space-between;
-			border-top: 1px solid rgba(0, 243, 255, 0.2);
-			padding-top: 10px;
-			font-family: 'Share Tech Mono', monospace;
+			border-bottom: 1px solid rgba(255,255,255,0.1);
+			padding: 8px 0;
+			font-size: 14px;
 		}
+		.info-label { color: var(--text-muted); }
+		.info-val { color: #fff; font-family: 'Share Tech Mono', monospace; }
 
-		/* Empty State */
-		.empty-state {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			height: 100%;
-			color: var(--text-muted);
-			font-style: italic;
+		a.app-link {
+			display: block;
+			text-align: center;
+			background: rgba(10, 255, 10, 0.1);
+			border: 1px solid var(--green);
+			color: var(--green);
+			padding: 15px;
+			text-decoration: none;
 			font-family: 'Share Tech Mono', monospace;
-			background: repeating-linear-gradient(
-				45deg,
-				rgba(0,0,0,0),
-				rgba(0,0,0,0) 10px,
-				rgba(0, 243, 255,0.02) 10px,
-				rgba(0, 243, 255,0.02) 20px
-			);
-		}
-
-		/* Scramble Class */
-		.scramble { display: inline-block; }
-
-		/* Floating Alert */
-		#toast {
-			position: fixed;
-			top: 0; left: 0; right: 0;
-			height: 80px;
-			background: rgba(255, 0, 50, 0.9);
-			z-index: 2000;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			font-family: 'Share Tech Mono', monospace;
-			font-size: 32px;
-			color: #000;
-			font-weight: bold;
 			text-transform: uppercase;
-			transform: translateY(-100%);
-			transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-			box-shadow: 0 5px 20px #ff0033;
+			font-weight: bold;
+			transition: 0.3s;
+			margin: 10px 0;
 		}
-		#toast.show { transform: translateY(0); }
+		a.app-link:hover {
+			background: var(--green);
+			color: #000;
+			box-shadow: 0 0 15px var(--green);
+		}
+
+		/* Spinner */
+		.loading-ring {
+			display: inline-block;
+			width: 20px;
+			height: 20px;
+			border: 2px solid transparent;
+			border-top: 2px solid currentColor;
+			border-right: 2px solid currentColor;
+			border-radius: 50%;
+			animation: spin 0.8s linear infinite;
+		}
+		@keyframes spin { 100% { transform: rotate(360deg); } }
 
 	</style>
 </head>
 <body>
 
-	<div id="toast">EVENT IMMINENT</div>
-
-	<div class="container">
-		<header>
-			<div>
-				<h1>Temporal Rift Analyzer <span class="badge">PRO v2.0</span></h1>
-				<div style="font-size:12px; color:var(--cyan); opacity:0.7; font-family:'Share Tech Mono';">ADVANCED PATTERN DECRYPTION MATRIX</div>
-			</div>
-			<div class="system-clock" id="clock">00:00:00</div>
-		</header>
-
-		<div class="interface-grid">
+	<div class="container" id="authContainer">
+		<div class="panel">
 			
-			<!-- Left Column: Input -->
-			<div class="panel">
-				<div class="panel-header">
-					<span>Source Stream</span>
-					<span>TXT-IN</span>
-				</div>
-				<div class="panel-body">
-					<textarea id="inputArea" placeholder="INPUT TEMPORAL COORDINATES...
-10:23:36
-10:24:56
-10:27:27" spellcheck="false"></textarea>
-					<div class="controls">
-						<button class="primary" id="analyzeBtn">Initialize Decryption</button>
-						<button id="clearBtn">Purge</button>
-						<button class="action-add" id="markNowBtn">Mark Current Sequence</button>
-					</div>
-				</div>
-			</div>
+			<h2>SECURE ACCESS</h2>
+			<p class="status" id="statusMessage">INITIALIZING PROTOCOLS...</p>
 
-			<!-- Right Column: Analysis -->
-			<div class="panel">
-				<div class="panel-header">
-					<span>Analysis Core</span>
-					<span id="patternType" class="scramble">AWAITING DATA</span>
-				</div>
-				<div class="panel-body" style="padding: 0;">
+			<!-- AUTH FORM (Initial View) -->
+			<div id="authForm" class="hidden">
+				<input type="email" id="emailInput" placeholder="OPERATOR ID [EMAIL]" autocomplete="email">
+				<input type="password" id="passwordInput" placeholder="ACCESS CODE [PASSWORD]" autocomplete="current-password">
+				
+				<div style="margin-top: 20px;">
+					<button id="loginBtn" class="primary">
+						<span id="loginText">AUTHENTICATE</span>
+						<div id="loginSpinner" class="loading-ring hidden"></div>
+					</button>
 					
-					<!-- Content Wrapper -->
-					<div id="resultsView" style="display:none; padding: 20px; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px;">
-						
-						<!-- Top Metrics -->
-						<div class="metrics-row">
-							<div class="metric-card">
-								<div class="metric-label">Integrity</div>
-								<div class="confidence-container">
-									<div class="metric-value highlight" id="confidenceVal">--%</div>
-									<div class="confidence-track"><div class="confidence-fill" id="confidenceBar"></div></div>
-								</div>
-							</div>
-							<div class="metric-card">
-								<div class="metric-label">Mean Interval</div>
-								<div class="metric-value" id="meanGap">--</div>
-							</div>
-							<div class="metric-card">
-								<div class="metric-label">Drift / Variance</div>
-								<div class="metric-value" id="driftVal">--</div>
-							</div>
-						</div>
-
-						<!-- Visualizer -->
-						<div>
-							<div class="metric-label" style="margin-bottom: 5px;">Temporal Waveform</div>
-							<div class="vis-wrapper">
-								<canvas id="canvas"></canvas>
-								<div class="vis-scanline"></div>
-							</div>
-						</div>
-
-						<!-- Table -->
-						<div style="flex: 1; overflow: hidden; display: flex; flex-direction: column;">
-							<div class="metric-label" style="margin-bottom: 5px;">Sequence Projection</div>
-							<div style="overflow-y: auto; border: 1px solid rgba(0, 243, 255, 0.2);">
-								<table class="forecast-table">
-									<thead>
-										<tr>
-											<th>ID</th>
-											<th>Timestamp</th>
-											<th>Interval</th>
-											<th>Status</th>
-										</tr>
-									</thead>
-									<tbody id="tableBody">
-										<!-- JS populates this -->
-									</tbody>
-								</table>
-							</div>
-						</div>
-
-						<div class="status-bar">
-							<span id="algoName">ALGO: STANDBY</span>
-							<span>LIVE MONITORING ACTIVE</span>
-						</div>
-
-					</div>
-
-					<!-- Empty State -->
-					<div id="emptyState" class="empty-state">
-						AWAITING INPUT TO BEGIN SEQUENCE DECRYPTION
-					</div>
-
+					<button id="getKeyBtn" class="ghost">
+						REQUEST ACCESS KEY
+					</button>
 				</div>
+
+				<div id="errorBox" class="error-box hidden"></div>
 			</div>
+
+			<!-- DASHBOARD (Authenticated View) -->
+			<div id="dashboard" class="hidden">
+				<div class="success-text">IDENTITY VERIFIED</div>
+				
+				<div style="margin-bottom: 20px;">
+					<div class="info-row">
+						<span class="info-label">UID:</span>
+						<span class="info-val" id="userIdDisplay">--</span>
+					</div>
+					<div class="info-row">
+						<span class="info-label">USER:</span>
+						<span class="info-val" id="userEmailDisplay">--</span>
+					</div>
+				</div>
+				
+				<!-- Link to Main App -->
+				<a href="app.html" class="app-link">
+					>> INITIALIZE PREDICTOR <<
+				</a>
+				
+				<button id="logoutBtn" class="danger">
+					TERMINATE SESSION
+				</button>
+			</div>
+
 		</div>
 	</div>
 
-	<script>
-		// --- State ---
-		let predictions = []; // Array of predicted timestamps (seconds)
-		let lastAnalysis = null;
+	<script type="module">
+		// --- Firebase SDK Imports (v11.6.1 for stability) ---
+		import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+		import { 
+			getAuth, 
+			signInAnonymously, 
+			signInWithCustomToken, 
+			onAuthStateChanged,
+			signInWithEmailAndPassword,
+			signOut
+		} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+		
+		// --- Firebase Configuration ---
+		// Fallback configuration provided by user
+		const fallbackConfig = {
+			apiKey: "AcbXX3KgvqD7B8Y4WjCu6yNx1Prfu5cNHz",
+			authDomain: "aviator-time-54227.firebaseapp.com",
+			projectId: "aviator-time-54227",
+			storageBucket: "aviator-time-54227.firebasestorage.app",
+			messagingSenderId: "898262142598",
+			appId: "1:898262142598:web:67faa0b1dd6676c75bcb07",
+			measurementId: "G-SFT4PP0NJX"
+		};
 		
 		// --- DOM Elements ---
-		const els = {
-			input: document.getElementById('inputArea'),
-			analyzeBtn: document.getElementById('analyzeBtn'),
-			clearBtn: document.getElementById('clearBtn'),
-			markBtn: document.getElementById('markNowBtn'),
-			results: document.getElementById('resultsView'),
-			empty: document.getElementById('emptyState'),
-			clock: document.getElementById('clock'),
-			canvas: document.getElementById('canvas'),
-			table: document.getElementById('tableBody'),
-			metrics: {
-				confVal: document.getElementById('confidenceVal'),
-				confBar: document.getElementById('confidenceBar'),
-				mean: document.getElementById('meanGap'),
-				drift: document.getElementById('driftVal'),
-				pattern: document.getElementById('patternType'),
-				algo: document.getElementById('algoName')
-			},
-			toast: document.getElementById('toast')
-		};
+		const authForm = document.getElementById('authForm');
+		const dashboard = document.getElementById('dashboard');
+		const emailInput = document.getElementById('emailInput');
+		const passwordInput = document.getElementById('passwordInput');
+		const loginBtn = document.getElementById('loginBtn');
+		const getKeyBtn = document.getElementById('getKeyBtn');
+		const logoutBtn = document.getElementById('logoutBtn');
+		const statusMessage = document.getElementById('statusMessage');
+		const errorBox = document.getElementById('errorBox');
+		const userIdDisplay = document.getElementById('userIdDisplay');
+		const userEmailDisplay = document.getElementById('userEmailDisplay');
 
-		// --- Core Math & Time Utilities ---
+		// Spinners and text elements
+		const loginSpinner = document.getElementById('loginSpinner');
+		const loginText = document.getElementById('loginText');
 
-		function timeToSec(str) {
-			const p = str.trim().split(':');
-			if(p.length !== 3) return null;
-			const h = parseInt(p[0]), m = parseInt(p[1]), s = parseInt(p[2]);
-			if(isNaN(h) || isNaN(m) || isNaN(s)) return null;
-			return h * 3600 + m * 60 + s;
-		}
+		let auth;
 
-		function secToTime(sec) {
-			sec = Math.round(sec);
-			sec = ((sec % 86400) + 86400) % 86400;
-			const h = Math.floor(sec / 3600).toString().padStart(2, '0');
-			const m = Math.floor((sec % 3600) / 60).toString().padStart(2, '0');
-			const s = (sec % 60).toString().padStart(2, '0');
-			return `${h}:${m}:${s}`;
-		}
-
-		// --- FX: Scramble Text ---
-		function scrambleText(element, finalText, duration = 800) {
-			const chars = 'AcbXX3KgvqD7B8Y4WjCu6yNx1Prfu5cNHz!@#$%^&*()';
-			let start = Date.now();
-			
-			function update() {
-				let elapsed = Date.now() - start;
-				let progress = elapsed / duration;
+		// --- Firebase Initialization ---
+		function initializeFirebase() {
+			try {
+				let config = fallbackConfig;
 				
-				if (progress >= 1) {
-					element.textContent = finalText;
-					return;
-				}
-
-				let scrambled = '';
-				for (let i = 0; i < finalText.length; i++) {
-					if (i / finalText.length < progress) {
-						scrambled += finalText[i];
-					} else {
-						scrambled += chars[Math.floor(Math.random() * chars.length)];
+				// Attempt to use the environment's auto-injected config if available
+				// This fixes issues where the hardcoded key is invalid but the environment works
+				if (typeof __firebase_config !== 'undefined') {
+					try {
+						config = JSON.parse(__firebase_config);
+						console.log("Using environment Firebase config");
+					} catch(e) {
+						console.warn("Error parsing __firebase_config, using fallback");
 					}
 				}
-				element.textContent = scrambled;
-				requestAnimationFrame(update);
+
+				const app = initializeApp(config);
+				auth = getAuth(app);
+				
+				// Set up initial authentication using custom token or anonymously
+				// Note: Anonymous Auth must be enabled in Firebase Console for this fallback to work
+				if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+					signInWithCustomToken(auth, __initial_auth_token)
+						.catch(e => {
+							console.error("Custom token sign in failed, attempting anonymous. Error:", e);
+							signInAnonymously(auth);
+						});
+				} else {
+					// Fallback to anonymous to show the UI state
+					signInAnonymously(auth).catch(e => console.log("Anonymous auth not enabled or failed", e));
+				}
+
+				statusMessage.textContent = "AWAITING CREDENTIALS...";
+
+				// Set up Authentication State Listener
+				onAuthStateChanged(auth, (user) => {
+					updateUI(user);
+				});
+
+			} catch (error) {
+				console.error("Firebase Initialization Error:", error);
+				statusMessage.textContent = `SYSTEM FAILURE: ${error.message}`;
+				authForm.classList.remove('hidden');
 			}
-			update();
 		}
 
-		// --- Advanced Analysis Engine ---
-
-		function analyzeData(rawLines) {
-			const seconds = rawLines.map(timeToSec).filter(x => x !== null);
-			if(seconds.length < 2) return { error: "Insufficient Data" };
-
-			// Calculate Gaps
-			const gaps = [];
-			for(let i=1; i<seconds.length; i++) {
-				let g = seconds[i] - seconds[i-1];
-				if (g < -40000) g += 86400; 
-				gaps.push(g);
-			}
-
-			// 1. Check for Pattern / Cycles
-			// We try periods 1 (fixed), 2 (alternating), 3, 4
-			let bestPeriod = 0;
-			let bestError = Infinity;
-
-			for (let p = 1; p <= 4; p++) {
-				if (gaps.length < p + 1) break; 
-
-				let errorSum = 0;
-				let count = 0;
-				
-				for (let i = p; i < gaps.length; i++) {
-					const diff = Math.abs(gaps[i] - gaps[i-p]);
-					const weight = 1 + (i / gaps.length); 
-					errorSum += diff * weight;
-					count += weight;
-				}
-
-				const avgError = errorSum / count;
-				if (avgError < bestError) {
-					bestError = avgError;
-					bestPeriod = p;
-				}
-			}
-
-			// 2. Check for Linear Drift (Acceleration)
-			let driftSum = 0;
-			if (gaps.length >= 2) {
-				for(let i=1; i<gaps.length; i++) driftSum += (gaps[i] - gaps[i-1]);
-			}
-			const avgDrift = gaps.length >= 2 ? driftSum / (gaps.length - 1) : 0;
-			const isDrifting = Math.abs(avgDrift) > 2; 
-
-			// --- Decision Logic ---
+		// --- UI Logic ---
+		function updateUI(user) {
+			errorBox.classList.add('hidden');
 			
-			let forecastGaps = [];
-			let patternName = "UNKNOWN";
-			let confidence = 0;
-			let algorithmUsed = "";
-
-			const meanGap = gaps.reduce((a,b)=>a+b,0) / gaps.length;
-
-			const relError = bestError / (meanGap || 1); 
-
-			if (gaps.length < 3) {
-				// Fallback
-				const last = gaps[gaps.length-1];
-				forecastGaps = [last, last, last];
-				patternName = "INSUFFICIENT DATA";
-				algorithmUsed = "LAST VALUE PROJECTION";
-				confidence = 50;
-			} else if (isDrifting && relError > 0.1) {
-				// Drift
-				patternName = "LINEAR DRIFT";
-				algorithmUsed = `LINEAR REGRESSION [${avgDrift > 0 ? '+' : ''}${Math.round(avgDrift)}s]`;
-				const lastGap = gaps[gaps.length-1];
-				forecastGaps = [
-					lastGap + avgDrift,
-					lastGap + avgDrift*2,
-					lastGap + avgDrift*3
-				];
-				confidence = 70; 
+			if (user && user.email) {
+				// Logged In with Email/Password
+				authForm.classList.add('hidden');
+				dashboard.classList.remove('hidden');
+				userIdDisplay.textContent = user.uid.substring(0, 12) + '...';
+				userEmailDisplay.textContent = user.email;
+				statusMessage.textContent = "ACCESS GRANTED";
+				statusMessage.style.color = "var(--green)";
+			} else if (user && user.isAnonymous) {
+				// Signed in Anonymously (Default state)
+				authForm.classList.remove('hidden');
+				dashboard.classList.add('hidden');
+				statusMessage.textContent = "IDENTIFICATION REQUIRED";
+				statusMessage.style.color = "var(--cyan)";
 			} else {
-				// Pattern Based
-				if (bestPeriod === 1) patternName = "FIXED INTERVAL";
-				else if (bestPeriod === 2) patternName = "ALTERNATING CYCLE";
-				else patternName = `COMPLEX CYCLE [${bestPeriod}-STEP]`;
-
-				algorithmUsed = `PATTERN MATCH [PERIOD: ${bestPeriod}]`;
-				
-				for (let k = 1; k <= 3; k++) {
-					const sourceIndex = gaps.length - bestPeriod + ((k-1) % bestPeriod);
-					if(sourceIndex >= 0) {
-						forecastGaps.push(gaps[sourceIndex]);
-					} else {
-						forecastGaps.push(meanGap); 
-					}
-				}
-
-				confidence = Math.max(0, Math.min(100, 100 - (relError * 200)));
+				// Logged Out
+				authForm.classList.remove('hidden');
+				dashboard.classList.add('hidden');
+				statusMessage.textContent = "SESSION TERMINATED";
+				statusMessage.style.color = "var(--danger)";
 			}
+		}
+		
+		function showLoading(buttonId, isLoading) {
+			const btn = document.getElementById(buttonId);
+			const text = document.getElementById(buttonId.replace('Btn', 'Text'));
+			const spinner = document.getElementById(buttonId.replace('Btn', 'Spinner'));
 
-			confidence = Math.round(confidence);
-
-			// Calculate Future Timestamps
-			const futureTimes = [];
-			let lastTime = seconds[seconds.length-1];
-			
-			forecastGaps.forEach(g => {
-				const nextT = lastTime + g;
-				futureTimes.push(nextT);
-				lastTime = nextT;
-			});
-
-			return {
-				gaps,
-				seconds,
-				forecastGaps,
-				futureTimes,
-				patternName,
-				algorithmUsed,
-				confidence,
-				meanGap,
-				avgDrift: isDrifting ? avgDrift : 0
-			};
+			btn.disabled = isLoading;
+			if (isLoading) {
+				if(text) text.classList.add('hidden');
+				if(spinner) spinner.classList.remove('hidden');
+			} else {
+				if(text) text.classList.remove('hidden');
+				if(spinner) spinner.classList.add('hidden');
+			}
 		}
 
-		// --- Rendering ---
-
-		function drawWaveform(gaps) {
-			const ctx = els.canvas.getContext('2d');
-			const w = els.canvas.width = els.canvas.offsetWidth;
-			const h = els.canvas.height = els.canvas.offsetHeight;
+		function displayError(message) {
+			errorBox.textContent = `ERROR: ${message}`;
+			errorBox.classList.remove('hidden');
+			// Flash effect
+			errorBox.style.opacity = '0';
+			setTimeout(() => errorBox.style.opacity = '1', 50);
 			
-			ctx.clearRect(0,0,w,h);
-			
-			if(!gaps.length) return;
-
-			const max = Math.max(...gaps) * 1.2;
-			const min = 0; // Baseline 0 makes waves look more dramatic
-			
-			const stepX = w / (gaps.length - 1 || 1);
-
-			// Draw Fill
-			ctx.beginPath();
-			ctx.moveTo(0, h);
-			gaps.forEach((g, i) => {
-				const x = i * stepX;
-				const y = h - ((g / max) * h); // Scale from bottom
-				ctx.lineTo(x,y);
-			});
-			ctx.lineTo(w, h);
-			const grad = ctx.createLinearGradient(0,0,0,h);
-			grad.addColorStop(0, 'rgba(188, 19, 254, 0.4)');
-			grad.addColorStop(1, 'rgba(188, 19, 254, 0)');
-			ctx.fillStyle = grad;
-			ctx.fill();
-			
-			// Draw Line
-			ctx.beginPath();
-			gaps.forEach((g, i) => {
-				const x = i * stepX;
-				const y = h - ((g / max) * h);
-				if(i===0) ctx.moveTo(x,y);
-				else ctx.lineTo(x,y);
-			});
-			ctx.strokeStyle = '#00f3ff';
-			ctx.lineWidth = 2;
-			ctx.stroke();
-
-			// Draw points
-			ctx.fillStyle = '#fff';
-			gaps.forEach((g, i) => {
-				const x = i * stepX;
-				const y = h - ((g / max) * h);
-				ctx.beginPath();
-				ctx.arc(x, y, 3, 0, Math.PI*2);
-				ctx.fill();
-			});
+			setTimeout(() => {
+				errorBox.classList.add('hidden');
+			}, 5000);
 		}
 
-		function renderResults(data) {
-			if(data.error) {
-				els.results.style.display = 'none';
-				els.empty.style.display = 'flex';
+		// --- Auth Handlers ---
+
+		async function handleLogin() {
+			const email = emailInput.value.trim();
+			const password = passwordInput.value.trim();
+			errorBox.classList.add('hidden');
+
+			if (!email || password.length < 6) {
+				displayError("INVALID INPUT PARAMETERS");
 				return;
 			}
 
-			els.empty.style.display = 'none';
-			els.results.style.display = 'flex'; 
-
-			// Update Metrics with effects
-			scrambleText(els.metrics.pattern, data.patternName);
-			els.metrics.pattern.style.color = data.confidence > 80 ? 'var(--green)' : 'var(--cyan)';
-			
-			els.metrics.confVal.textContent = data.confidence + '%';
-			els.metrics.confBar.style.width = data.confidence + '%';
-			els.metrics.confBar.style.backgroundColor = data.confidence > 70 ? 'var(--green)' : (data.confidence < 40 ? 'var(--danger)' : 'var(--purple)');
-
-			els.metrics.mean.textContent = Math.round(data.meanGap) + 's';
-			els.metrics.drift.textContent = Math.round(data.avgDrift) + 's';
-			els.metrics.algo.textContent = data.algorithmUsed;
-
-			// Draw Wave
-			drawWaveform(data.gaps);
-
-			// Build Table
-			let html = '';
-			
-			// 1. Historical Rows (Last 5 only to save space)
-			const startIdx = Math.max(0, data.seconds.length - 5);
-			for(let i = startIdx; i < data.seconds.length; i++) {
-				const gapStr = i > 0 ? `+${Math.round(data.gaps[i-1])}s` : '-';
-				html += `
-					<tr>
-						<td style="color:var(--text-muted)">#${String(i+1).padStart(2,'0')}</td>
-						<td>${secToTime(data.seconds[i])}</td>
-						<td style="color:var(--text-muted)">${gapStr}</td>
-						<td style="font-size:11px; color:var(--text-muted)">ARCHIVED</td>
-					</tr>
-				`;
-			}
-
-			// 2. Prediction Rows
-			data.futureTimes.forEach((t, i) => {
-				const gap = Math.round(data.forecastGaps[i]);
-				html += `
-					<tr class="row-prediction">
-						<td style="color:var(--purple)">T+${i+1}</td>
-						<td style="font-weight:bold">${secToTime(t)}</td>
-						<td>+${gap}s</td>
-						<td><span class="countdown-badge" id="cd-${i}">WAITING</span></td>
-					</tr>
-				`;
-			});
-
-			els.table.innerHTML = html;
-
-			// Store predictions for clock loop
-			predictions = data.futureTimes;
-		}
-
-		// --- Main Loop & Events ---
-
-		function run() {
-			const text = els.input.value;
-			const lines = text.split('\n').filter(l => l.trim().length > 0);
-			const data = analyzeData(lines);
-			renderResults(data);
-		}
-
-		function updateClock() {
-			const now = new Date();
-			const nowSec = now.getHours()*3600 + now.getMinutes()*60 + now.getSeconds();
-			const timeStr = [now.getHours(), now.getMinutes(), now.getSeconds()]
-				.map(n => String(n).padStart(2,'0')).join(':');
-			
-			els.clock.textContent = timeStr;
-
-			// Update Countdowns in Table
-			if(predictions.length > 0) {
-				let nearestDiff = Infinity;
-
-				predictions.forEach((t, i) => {
-					const el = document.getElementById(`cd-${i}`);
-					if(!el) return;
-
-					let diff = t - nowSec;
-					if(diff < -40000) diff += 86400; // Handle midnight wrap forecast
-
-					if(diff > 0) {
-						el.textContent = `${Math.ceil(diff)}s`;
-						if(diff < nearestDiff) nearestDiff = diff;
-						
-						if(diff < 10) el.classList.add('imminent');
-						else el.classList.remove('imminent');
-					} else {
-						el.textContent = "PASSED";
-						el.classList.remove('imminent');
-						el.style.opacity = 0.5;
-					}
-				});
-
-				// Global Toast
-				if(nearestDiff < 10 && nearestDiff > 0) {
-					els.toast.classList.add('show');
-					els.toast.textContent = `IMMINENT EVENT: ${Math.ceil(nearestDiff)}s`;
-				} else {
-					els.toast.classList.remove('show');
+			showLoading('loginBtn', true);
+			try {
+				await signInWithEmailAndPassword(auth, email, password);
+				// Success is handled by onAuthStateChanged
+			} catch (error) {
+				let errorMessage = "UNKNOWN ERROR";
+				if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+					errorMessage = "INVALID CREDENTIALS";
+				} else if (error.code) {
+					errorMessage = error.message.replace('Firebase: ', '').toUpperCase();
 				}
+				displayError(errorMessage);
+			} finally {
+				showLoading('loginBtn', false);
 			}
-
-			requestAnimationFrame(updateClock);
 		}
 
-		// Event Listeners
-		els.analyzeBtn.addEventListener('click', run);
-		
-		els.clearBtn.addEventListener('click', () => {
-			els.input.value = '';
-			predictions = [];
-			els.results.style.display = 'none';
-			els.empty.style.display = 'flex';
-			els.toast.classList.remove('show');
-		});
+		function handleGetKey() {
+			const phoneNumber = "94774337016"; 
+			const message = "I require an access key for the Temporal Rift Analyzer";
+			const encodedMessage = encodeURIComponent(message);
+			const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+			window.open(whatsappUrl, '_blank');
+			statusMessage.textContent = "ESTABLISHING COMMS LINK...";
+		}
 
-		els.markBtn.addEventListener('click', () => {
-			const now = new Date();
-			const t = [now.getHours(), now.getMinutes(), now.getSeconds()]
-				.map(n => String(n).padStart(2,'0')).join(':');
-			
-			const val = els.input.value.trim();
-			// No dupes
-			if(!val.endsWith(t)) {
-				els.input.value = val ? (val + '\n' + t) : t;
-				// If we have enough data, auto-analyze
-				if(els.input.value.split('\n').length > 1) run();
+		async function handleLogout() {
+			try {
+				await signOut(auth);
+				emailInput.value = '';
+				passwordInput.value = '';
+			} catch (error) {
+				console.error("Logout Error:", error);
+				displayError("LOGOUT FAILURE");
+			}
+		}
+
+		// --- Event Listeners ---
+		loginBtn.addEventListener('click', handleLogin);
+		getKeyBtn.addEventListener('click', handleGetKey);
+		logoutBtn.addEventListener('click', handleLogout);
+
+		passwordInput.addEventListener('keydown', (e) => {
+			if (e.key === 'Enter') {
+				handleLogin();
 			}
 		});
 
-		// Init
-		updateClock();
-		// Demo Data
-		setTimeout(() => {
-			els.input.value = "10:20:00\n10:25:00\n10:30:05\n10:35:10\n10:40:15";
-			run();
-		}, 500);
-
+		// --- Init ---
+		initializeFirebase();
 	</script>
 </body>
 </html>
